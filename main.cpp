@@ -170,7 +170,7 @@ string initializeGLFW()
 }
 string createWindow(GLFWwindow*& w)
 {
-    w=glfwCreateWindow(WINDOWS_WIDTH,WINDOWS_HEIGHT,"IUPAC Name Generator",NULL,NULL);
+    w=glfwCreateWindow(WINDOWS_WIDTH,WINDOWS_HEIGHT,"Evolving Snakes",NULL,NULL);
     if (!w)
     {
         glfwTerminate();
@@ -344,7 +344,14 @@ void run(GLFWwindow* w)
                 snakes[i].direction+=4;
                 snakes[i].direction%=4;
             }
-            if (rand()%5==0) snakes[i].eat();
+            for (int j=0;j<foods.size();++j)
+            {
+                if (snakes[i].blocks[0]==foods[j])
+                {
+                    foods.erase(foods.begin()+j);
+                    snakes[i].eat();
+                }
+            }
             snakes[i].moveForward();
         }
         do
