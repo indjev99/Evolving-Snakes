@@ -23,6 +23,7 @@ double FOOD_COLOUR_R=0.1;
 double FOOD_COLOUR_G=1;
 double FOOD_COLOUR_B=0.05;
 int FIELD_RADIUS=20;
+int ENERGY_LOSS_SPEED=100;
 
 int pressed;
 double mxpos=0,mypos=0;
@@ -48,12 +49,16 @@ struct point
         y=rand()%(2*FIELD_RADIUS)-FIELD_RADIUS;
     }
 };
+struct block:point
+{
+    int food;
+};
 struct snake
 {
-    vector<point> blocks;
-    deque<point> foods;
+    vector<block> blocks;
     double colour_r, colour_g, colour_b;
     int direction;
+    int to_next_loss;
     snake()
     {
         blocks.resize(1);
@@ -63,6 +68,7 @@ struct snake
         colour_r=1;
         colour_g=1;
         colour_b=1;
+        to_next_loss=ENERGY_LOSS_SPEED;
     }
     snake(int new_x, int new_y, int new_dir, double new_red, double new_green, double new_blue)
     {
@@ -73,6 +79,7 @@ struct snake
         colour_r=new_red;
         colour_g=new_green;
         colour_b=new_blue;
+        to_next_loss=ENERGY_LOSS_SPEED;
     }
     void randomise()
     {
@@ -82,31 +89,44 @@ struct snake
         colour_r=rand()%1001/1000.0;
         colour_g=rand()%1001/1000.0;
         colour_b=rand()%1001/1000.0;
+        to_next_loss=ENERGY_LOSS_SPEED;
     }
     void moveForward()
     {
-        point new_pos=blocks[blocks.size()-1];
+        block new_pos=blocks[blocks.size()-1];
         for (int i=blocks.size()-1;i>0;--i)
         {
             blocks[i]=blocks[i-1];
         }
+        blocks[0].food=0;
         blocks[0]+=direction;
+        --to_next_loss;
+        if (to_next_loss==0)
+        {
+            --blocks[0].food;
+            to_next_loss=ENERGY_LOSS_SPEED;
+        }
         if (blocks[0].x>=FIELD_RADIUS) blocks[0].x=-FIELD_RADIUS;
         if (blocks[0].y>=FIELD_RADIUS) blocks[0].y=-FIELD_RADIUS;
         if (blocks[0].x<-FIELD_RADIUS) blocks[0].x=FIELD_RADIUS-1;
         if (blocks[0].y<-FIELD_RADIUS) blocks[0].y=FIELD_RADIUS-1;
-        if (!foods.empty() && foods.front()==new_pos)
+        if (new_pos.food>0)
         {
+            --new_pos.food;
             blocks.push_back(new_pos);
-            foods.pop_front();
+        }
+        if (blocks[blocks.size()-1].food<0)
+        {
+            if (blocks.size()>1)
+            {
+                blocks[blocks.size()-2].food+=blocks[blocks.size()-1].food+1;
+                blocks.resize(blocks.size()-1);
+            }
         }
     }
     void eat()
     {
-        point f;
-        f.x=blocks[0].x;
-        f.y=blocks[0].y;
-        foods.push_back(f);
+        ++blocks[0].food;
     }
 };
 
@@ -325,7 +345,7 @@ void run(GLFWwindow* w)
     {
         start=clock();
         drawWindow(w,snakes,foods);
-        if (rand()%20==0)
+        if (rand()*rand()%100000<=double(100000)*FIELD_RADIUS*FIELD_RADIUS/6000)
         {
             f.randomise();
             foods.push_back(f);
