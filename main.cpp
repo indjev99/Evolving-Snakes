@@ -59,8 +59,10 @@ struct snake
     double colour_r, colour_g, colour_b;
     int direction;
     int to_next_loss;
+    bool dead;
     snake()
     {
+        dead=0;
         blocks.resize(1);
         blocks[0].x=0;
         blocks[0].y=0;
@@ -70,8 +72,22 @@ struct snake
         colour_b=1;
         to_next_loss=ENERGY_LOSS_SPEED;
     }
+    snake(int food)
+    {
+        dead=0;
+        blocks.resize(1);
+        blocks[0].x=0;
+        blocks[0].y=0;
+        blocks[0].food=food;
+        direction=0;
+        colour_r=1;
+        colour_g=1;
+        colour_b=1;
+        to_next_loss=ENERGY_LOSS_SPEED;
+    }
     snake(int new_x, int new_y, int new_dir, double new_red, double new_green, double new_blue)
     {
+        dead=0;
         blocks.resize(1);
         blocks[0].x=new_x;
         blocks[0].y=new_y;
@@ -81,18 +97,46 @@ struct snake
         colour_b=new_blue;
         to_next_loss=ENERGY_LOSS_SPEED;
     }
+    snake(int new_x, int new_y, int new_dir, double new_red, double new_green, double new_blue, int food)
+    {
+        dead=0;
+        blocks.resize(1);
+        blocks[0].x=new_x;
+        blocks[0].y=new_y;
+        blocks[0].food=food;
+        direction=new_dir;
+        colour_r=new_red;
+        colour_g=new_green;
+        colour_b=new_blue;
+        to_next_loss=ENERGY_LOSS_SPEED;
+    }
     void randomise()
     {
+        dead=0;
         blocks.resize(1);
         blocks[0].randomise();
+        blocks[0].food=0;
         direction=rand()%4;
         colour_r=rand()%1001/1000.0;
         colour_g=rand()%1001/1000.0;
         colour_b=rand()%1001/1000.0;
         to_next_loss=ENERGY_LOSS_SPEED;
     }
-    void moveForward()
+    void randomise(int food)
     {
+        dead=0;
+        blocks.resize(1);
+        blocks[0].randomise();
+        blocks[0].food=food;
+        direction=rand()%4;
+        colour_r=rand()%1001/1000.0;
+        colour_g=rand()%1001/1000.0;
+        colour_b=rand()%1001/1000.0;
+        to_next_loss=ENERGY_LOSS_SPEED;
+    }
+    bool moveForward()
+    {
+        if (dead) return 0;
         block new_pos=blocks[blocks.size()-1];
         for (int i=blocks.size()-1;i>0;--i)
         {
@@ -122,7 +166,13 @@ struct snake
                 blocks[blocks.size()-2].food+=blocks[blocks.size()-1].food+1;
                 blocks.resize(blocks.size()-1);
             }
+            else
+            {
+                dead=1;
+                return 1;
+            }
         }
+        return 0;
     }
     void eat()
     {
@@ -333,11 +383,11 @@ void run(GLFWwindow* w)
     vector<snake> snakes;
     vector<point> foods;
     point f;
-    snake s;
+    snake s(3);
     snakes.push_back(s);
     for (int i=0;i<5;++i)
     {
-        s.randomise();
+        s.randomise(3);
         snakes.push_back(s);
     }
     clock_t start,curr;
@@ -349,6 +399,11 @@ void run(GLFWwindow* w)
         {
             f.randomise();
             foods.push_back(f);
+        }
+        if (rand()*rand()%100000<=double(100000)*FIELD_RADIUS*FIELD_RADIUS/60000)
+        {
+            s.randomise(3);
+            snakes.push_back(s);
         }
         if (!presses.empty() && !snakes.empty())
         {
@@ -372,7 +427,10 @@ void run(GLFWwindow* w)
                     snakes[i].eat();
                 }
             }
-            snakes[i].moveForward();
+            if (snakes[i].moveForward())
+            {
+                snakes.erase(snakes.begin()+i);
+            }
         }
         do
         {
