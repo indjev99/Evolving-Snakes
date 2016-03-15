@@ -16,13 +16,13 @@ const int ORIGINAL_WINDOWS_WIDTH=1000;
 const int ORIGINAL_WINDOWS_HEIGHT=1000;
 int WINDOWS_WIDTH=ORIGINAL_WINDOWS_WIDTH;
 int WINDOWS_HEIGHT=ORIGINAL_WINDOWS_HEIGHT;
-double BACKGROUND_COLOUR_R=0;
-double BACKGROUND_COLOUR_G=0;
-double BACKGROUND_COLOUR_B=0;
+const double BACKGROUND_COLOUR_R=0;
+const double BACKGROUND_COLOUR_G=0;
+const double BACKGROUND_COLOUR_B=0;
 double FOOD_COLOUR_R=0.1;
 double FOOD_COLOUR_G=1;
 double FOOD_COLOUR_B=0.05;
-int FIELD_RADIUS=20;
+const int FIELD_RADIUS=20;
 int ENERGY_LOSS_SPEED=100;
 
 int pressed;
@@ -59,6 +59,7 @@ struct snake
     double colour_r, colour_g, colour_b;
     int direction;
     int to_next_loss;
+    double defence,attack;
     bool dead;
     snake()
     {
@@ -67,7 +68,9 @@ struct snake
         blocks[0].x=0;
         blocks[0].y=0;
         direction=0;
-        colour_r=1;
+        attack=0.5;
+        defence=1-attack;
+        colour_r=attack;
         colour_g=1;
         colour_b=1;
         to_next_loss=ENERGY_LOSS_SPEED;
@@ -80,24 +83,58 @@ struct snake
         blocks[0].y=0;
         blocks[0].food=food;
         direction=0;
-        colour_r=1;
+        attack=0.5;
+        defence=1-attack;
+        colour_r=attack;
         colour_g=1;
         colour_b=1;
         to_next_loss=ENERGY_LOSS_SPEED;
     }
-    snake(int new_x, int new_y, int new_dir, double new_red, double new_green, double new_blue)
+    snake(double new_attack, int food)
+    {
+        dead=0;
+        blocks.resize(1);
+        blocks[0].x=0;
+        blocks[0].y=0;
+        blocks[0].food=food;
+        direction=0;
+        attack=new_attack;
+        defence=1-attack;
+        colour_r=attack;
+        colour_g=1;
+        colour_b=1;
+        to_next_loss=ENERGY_LOSS_SPEED;
+    }
+    snake(double new_attack, double new_green, double new_blue, int food)
+    {
+        dead=0;
+        blocks.resize(1);
+        blocks[0].x=0;
+        blocks[0].y=0;
+        blocks[0].food=food;
+        direction=0;
+        attack=new_attack;
+        defence=1-attack;
+        colour_r=attack;
+        colour_g=new_green;
+        colour_b=new_blue;
+        to_next_loss=ENERGY_LOSS_SPEED;
+    }
+    snake(int new_x, int new_y, int new_dir, double new_attack, double new_green, double new_blue)
     {
         dead=0;
         blocks.resize(1);
         blocks[0].x=new_x;
         blocks[0].y=new_y;
         direction=new_dir;
-        colour_r=new_red;
+        attack=new_attack;
+        defence=1-attack;
+        colour_r=attack;
         colour_g=new_green;
         colour_b=new_blue;
         to_next_loss=ENERGY_LOSS_SPEED;
     }
-    snake(int new_x, int new_y, int new_dir, double new_red, double new_green, double new_blue, int food)
+    snake(int new_x, int new_y, int new_dir, double new_attack, double new_green, double new_blue, int food)
     {
         dead=0;
         blocks.resize(1);
@@ -105,7 +142,9 @@ struct snake
         blocks[0].y=new_y;
         blocks[0].food=food;
         direction=new_dir;
-        colour_r=new_red;
+        attack=new_attack;
+        defence=1-attack;
+        colour_r=attack;
         colour_g=new_green;
         colour_b=new_blue;
         to_next_loss=ENERGY_LOSS_SPEED;
@@ -117,7 +156,9 @@ struct snake
         blocks[0].randomise();
         blocks[0].food=0;
         direction=rand()%4;
-        colour_r=rand()%1001/1000.0;
+        attack=rand()%1001/1000.0;
+        defence=1-attack;
+        colour_r=attack;
         colour_g=rand()%1001/1000.0;
         colour_b=rand()%1001/1000.0;
         to_next_loss=ENERGY_LOSS_SPEED;
@@ -129,7 +170,9 @@ struct snake
         blocks[0].randomise();
         blocks[0].food=food;
         direction=rand()%4;
-        colour_r=rand()%1001/1000.0;
+        attack=rand()%1001/1000.0;
+        defence=1-attack;
+        colour_r=attack;
         colour_g=rand()%1001/1000.0;
         colour_b=rand()%1001/1000.0;
         to_next_loss=ENERGY_LOSS_SPEED;
@@ -169,6 +212,7 @@ struct snake
             else
             {
                 dead=1;
+                blocks.resize(0);
                 return 1;
             }
         }
@@ -177,6 +221,38 @@ struct snake
     void eat()
     {
         ++blocks[0].food;
+    }
+    bool getBit(int node, double enemy_attack)
+    {
+        if (node!=0)
+        {
+            if (enemy_attack>defence)
+            {
+                blocks.resize(node);
+            }
+        }
+        else
+        {
+            if (enemy_attack>defence)
+            {
+                dead=1;
+                blocks.resize(0);
+                return 1;
+            }
+        }
+        return 0;
+    }
+    void bite(double enemy_defence)
+    {
+        cout<<enemy_defence<<" "<<attack<<endl;
+        if (enemy_defence>=attack)
+        {
+            dead=1;
+        }
+        else
+        {
+            eat();
+        }
     }
 };
 
@@ -279,9 +355,9 @@ void drawSnake(snake& s)
     point bl;
     double x,y,x2,y2;
 
-    glBegin(GL_QUADS);
-
     glColor3f(s.colour_r*0.75,s.colour_g*0.75,s.colour_b*0.75);
+
+    glBegin(GL_QUADS);
 
     bl=s.blocks[0];
     x=bl.x;
@@ -295,7 +371,11 @@ void drawSnake(snake& s)
     glVertex2f(x2,y2);
     glVertex2f(x,y2);
 
+    glEnd();
+
     glColor3f(s.colour_r,s.colour_g,s.colour_b);
+
+    glBegin(GL_QUADS);
 
     for (int i=1;i<s.blocks.size();++i)
     {
@@ -377,28 +457,68 @@ void drawWindow(GLFWwindow* w, vector<snake>& snakes, vector<point>& foods)
 
     glfwSwapBuffers(w);
 }
+typedef vector<pair<int, int> > field[2*FIELD_RADIUS][2*FIELD_RADIUS];
+void generateField(field& field, vector<snake>& snakes, vector<point>& foods)
+{
+    pair<int, int> curr;
+    for (int i=0;i<2*FIELD_RADIUS;++i)
+    {
+        for (int j=0;j<2*FIELD_RADIUS;++j)
+        {
+            field[i][j].resize(0);
+        }
+    }
+    for (int i=0;i<foods.size();++i)
+    {
+        curr.first=i;
+        curr.second=-1;
+        field[foods[i].x+FIELD_RADIUS][foods[i].y+FIELD_RADIUS].push_back(curr);
+    }
+    for (int i=0;i<snakes.size();++i)
+    {
+        for (int j=0;j<snakes[i].blocks.size();++j)
+        {
+            curr.first=i;
+            curr.second=j;
+            field[snakes[i].blocks[j].x+FIELD_RADIUS][snakes[i].blocks[j].y+FIELD_RADIUS].push_back(curr);
+        }
+    }
+}
+double attack,blue,green;
 void run(GLFWwindow* w)
 {
     srand(time(NULL));
     vector<snake> snakes;
     vector<point> foods;
-    point f;
-    snake s(3);
+    field field;
+    int x,y;
+    pair<int, int> curr_square;
+    point curr_food;
+
+    cout<<"Enter attack (0-1): ";
+    cin>>attack;
+    cout<<"Enter blue (0-1): ";
+    cin>>blue;
+    cout<<"Enter green (0-1): ";
+    cin>>green;
+
+    snake s(attack,green,blue,3);
+    cout<<s.attack<<" "<<s.defence<<endl;
     snakes.push_back(s);
     for (int i=0;i<5;++i)
     {
         s.randomise(3);
         snakes.push_back(s);
     }
-    clock_t start,curr;
+    clock_t start_time,curr_time;
     while (!glfwWindowShouldClose(w))
     {
-        start=clock();
+        start_time=clock();
         drawWindow(w,snakes,foods);
         if (rand()*rand()%100000<=double(100000)*FIELD_RADIUS*FIELD_RADIUS/6000)
         {
-            f.randomise();
-            foods.push_back(f);
+            curr_food.randomise();
+            foods.push_back(curr_food);
         }
         if (rand()*rand()%100000<=double(100000)*FIELD_RADIUS*FIELD_RADIUS/60000)
         {
@@ -407,7 +527,8 @@ void run(GLFWwindow* w)
         }
         if (!presses.empty() && !snakes.empty())
         {
-            snakes[0].direction=presses.front();
+            if ((snakes[0].direction+presses.front())%2)
+                snakes[0].direction=presses.front();
             presses.pop();
         }
         for (int i=0;i<snakes.size();++i)
@@ -419,25 +540,67 @@ void run(GLFWwindow* w)
                 snakes[i].direction+=4;
                 snakes[i].direction%=4;
             }
-            for (int j=0;j<foods.size();++j)
-            {
-                if (snakes[i].blocks[0]==foods[j])
-                {
-                    foods.erase(foods.begin()+j);
-                    snakes[i].eat();
-                }
-            }
             if (snakes[i].moveForward())
             {
                 snakes.erase(snakes.begin()+i);
             }
         }
+        generateField(field,snakes,foods);
+        for (int i=0;i<snakes.size();++i)
+        {
+            x=snakes[i].blocks[0].x;
+            y=snakes[i].blocks[0].y;
+            for (int j=0;j<field[x+FIELD_RADIUS][y+FIELD_RADIUS].size();++j)
+            {
+                curr_square=field[x+FIELD_RADIUS][y+FIELD_RADIUS][j];
+                if (curr_square.second==-1)
+                {
+                    foods.erase(foods.begin()+curr_square.first);
+                    field[x+FIELD_RADIUS][y+FIELD_RADIUS].erase(field[x+FIELD_RADIUS][y+FIELD_RADIUS].begin()+j);
+                    snakes[i].eat();
+                }
+                else if (curr_square.second==-2)
+                {
+                    snakes[i].bite(10);
+                }
+                else if (curr_square.second!=0)
+                {
+                    cout<<i<<" "<<curr_square.first<<" "<<curr_square.second<<" "<<snakes[i].attack<<endl;
+                    if (snakes[curr_square.first].getBit(curr_square.second,snakes[i].attack))
+                    {
+                        ///TODO create a destroy vector and also remove the eaten part of the snake
+                        snakes.erase(snakes.begin()+i);
+                        break;
+                    }
+                    snakes[i].bite(snakes[curr_square.first].defence);
+                }
+                else
+                {
+                    if (curr_square.first!=i)
+                    {
+                        x=curr_square.first;
+                        y=i;
+                        if (snakes[x].attack<snakes[y].attack)
+                        {
+                            swap(x,y);
+                        }
+                        if (snakes[y].getBit(0,snakes[x].attack))
+                        {
+                            ///TODO create a destroy vector and also remove the eaten part of the snake
+                            snakes.erase(snakes.begin()+i);
+                            break;
+                        }
+                        snakes[x].bite(snakes[y].defence);
+                    }
+                }
+            }
+        }
         do
         {
             glfwPollEvents();
-            curr=clock();
+            curr_time=clock();
         }
-        while(!glfwWindowShouldClose(w) && double(curr-start)/CLOCKS_PER_SEC<0.1);
+        while(!glfwWindowShouldClose(w) && double(curr_time-start_time)/CLOCKS_PER_SEC<0.1);
     }
 }
 int main()
