@@ -476,10 +476,10 @@ void generateField(field& field, vector<snake>& snakes, vector<point>& foods)
     }
     for (int i=0;i<snakes.size();++i)
     {
-        for (int j=0;j<snakes[i].blocks.size();++j)
+        for (int j=0;j<snakes[i].blocks.size()-1;++j)
         {
             curr.first=i;
-            curr.second=j;
+            curr.second=j+1;
             field[snakes[i].blocks[j].x+FIELD_RADIUS][snakes[i].blocks[j].y+FIELD_RADIUS].push_back(curr);
         }
     }
@@ -531,6 +531,7 @@ void run(GLFWwindow* w)
                 snakes[0].direction=presses.front();
             presses.pop();
         }
+        generateField(field,snakes,foods);
         for (int i=0;i<snakes.size();++i)
         {
             if (i!=0 && rand()%8==0)
@@ -545,7 +546,6 @@ void run(GLFWwindow* w)
                 snakes.erase(snakes.begin()+i);
             }
         }
-        generateField(field,snakes,foods);
         for (int i=0;i<snakes.size();++i)
         {
             x=snakes[i].blocks[0].x;
