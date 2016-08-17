@@ -1,0 +1,35 @@
+#include "../headers/food.h"
+
+const double food::DEFAULT_COLOUR_R=0.15;
+const double food::DEFAULT_COLOUR_G=1;
+const double food::DEFAULT_COLOUR_B=0.05;
+
+food::food()
+{
+    colour_r=DEFAULT_COLOUR_R;
+    colour_g=DEFAULT_COLOUR_G;
+    colour_b=DEFAULT_COLOUR_B;
+}
+food::food(int new_x, int new_y)
+{
+    x=new_x;
+    y=new_y;
+    colour_r=DEFAULT_COLOUR_R;
+    colour_g=DEFAULT_COLOUR_G;
+    colour_b=DEFAULT_COLOUR_B;
+}
+food::food(double red, double green, double blue)
+{
+    randomise();
+    colour_r=red;
+    colour_g=green;
+    colour_b=blue;
+}
+food::food(int new_x, int new_y, double red, double green, double blue)
+{
+    x=new_x;
+    y=new_y;
+    colour_r=red;
+    colour_g=green;
+    colour_b=blue;
+}

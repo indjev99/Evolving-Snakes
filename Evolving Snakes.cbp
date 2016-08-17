@@ -46,7 +46,39 @@
 			<Add library="opengl32" />
 			<Add directory="lib-mingw" />
 		</Linker>
-		<Unit filename="main.cpp" />
+		<Unit filename="headers/block.h" />
+		<Unit filename="headers/colours.h" />
+		<Unit filename="headers/controller.h" />
+		<Unit filename="headers/ctrNeuralNetwork.h" />
+		<Unit filename="headers/ctrRandom.h" />
+		<Unit filename="headers/decision.h" />
+		<Unit filename="headers/draw.h" />		
+		<Unit filename="sources/draw_neural_net.h" />
+		<Unit filename="headers/field.h" />
+		<Unit filename="headers/field_radius.h" />
+		<Unit filename="headers/food.h" />
+		<Unit filename="headers/point.h" />
+		<Unit filename="headers/randomisation.h" />
+		<Unit filename="headers/run.h" />
+		<Unit filename="headers/sight.h" />
+		<Unit filename="headers/snake.h" />
+		<Unit filename="headers/window_functions.h" />
+		<Unit filename="headers/window_size.h" />
+		<Unit filename="sources/colours.cpp" />
+		<Unit filename="sources/controller.cpp" />
+		<Unit filename="sources/ctrNeuralNetwork.cpp" />
+		<Unit filename="sources/ctrRandom.cpp" />
+		<Unit filename="sources/draw.cpp" />
+		<Unit filename="sources/draw_neural_net.cpp" />
+		<Unit filename="sources/food.cpp" />
+		<Unit filename="sources/main.cpp" />
+		<Unit filename="sources/point.cpp" />
+		<Unit filename="sources/randomisation.cpp" />
+		<Unit filename="sources/run.cpp" />
+		<Unit filename="sources/sight.cpp" />
+		<Unit filename="sources/snake.cpp" />
+		<Unit filename="sources/window_functions.cpp" />
+		<Unit filename="sources/window_size.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
