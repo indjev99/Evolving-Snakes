@@ -5,13 +5,14 @@
 #include<string>
 #include<vector>
 
-const int VF_RADIUS=1;
-const int VS_RADIUS=0;
 extern const int inputs;
 extern const int outputs;
 
 struct controller
 {
+    static const int VF_RADIUS=1;
+    static const int VS_RADIUS=0;
+
     int VF_dist[1+2*VF_RADIUS];
     bool VF_food[1+2*VF_RADIUS];
     int VL_dist[1+2*VS_RADIUS];

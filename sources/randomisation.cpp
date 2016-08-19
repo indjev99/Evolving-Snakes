@@ -1,7 +1,7 @@
 #include "../headers/randomisation.h"
 #include<stdlib.h>
 
-const int MAX_MUTATION=30;
+int MAX_MUTATION=30;
 
 void mutateVariable(double& variable, double low, double high)
 {

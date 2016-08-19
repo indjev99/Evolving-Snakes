@@ -64,15 +64,29 @@ void drawGrid(double colour_r, double colour_g, double colour_b, double thicknes
 
     glEnd();
 }
-void drawSnake(snake& s)
+void drawSnake(snake& s, bool selected)
 {
     if (s.blocks.empty()) return;
 
     point bl;
     double x,y,x2,y2;
+    double r,g,b;
+    r=s.colour_r;
+    g=s.colour_g;
+    b=s.colour_b;
 
-    if (!s.dead) glColor3f(s.colour_r*0.75,s.colour_g*0.75,s.colour_b*0.75);
-    else glColor3f(s.colour_r,s.colour_g,s.colour_b);
+    if (selected)
+    {
+        if (r>0.5) r-=0.5;
+        else r+=0.5;
+        if (g>0.5) g-=0.5;
+        else g+=0.5;
+        if (b>0.5) b-=0.5;
+        else b+=0.5;
+    }
+
+    if (!s.dead) glColor3f(r*0.75,g*0.75,b*0.75);
+    else glColor3f(r,g,b);
 
     glBegin(GL_QUADS);
 
@@ -90,7 +104,7 @@ void drawSnake(snake& s)
 
     glEnd();
 
-    glColor3f(s.colour_r,s.colour_g,s.colour_b);
+    glColor3f(r,g,b);
 
     glBegin(GL_QUADS);
 
@@ -132,7 +146,7 @@ void drawFood(food& f)
 
     glEnd();
 }
-void drawWindow(GLFWwindow* w, std::vector<snake>& snakes, std::vector<food>& foods)
+void drawWindow(GLFWwindow* w, std::vector<snake>& snakes, std::vector<food>& foods, int selected)
 {
     glfwSetWindowShouldClose(w,0);
     pressed=-1;
@@ -165,7 +179,7 @@ void drawWindow(GLFWwindow* w, std::vector<snake>& snakes, std::vector<food>& fo
     //drawGrid(0.1,0.1,0.1,0.1);
     for (int i=0;i<snakes.size();++i)
     {
-        drawSnake(snakes[i]);
+        drawSnake(snakes[i],selected==i);
     }
     for (int i=0;i<foods.size();++i)
     {

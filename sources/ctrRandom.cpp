@@ -21,10 +21,10 @@ decision ctrRandom::think()
     decision decision;
     decision.turn_right=!(rand()%8);
     decision.turn_left=!(rand()%8);
-    if (body_length>1)
+    if (body_length>0)
     {
         decision.split=!(rand()%150);
-        decision.split_length=rand()%(body_length-1);
+        decision.split_length=rand()%body_length;
     }
     else
     {

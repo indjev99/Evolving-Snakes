@@ -19,11 +19,11 @@
 using namespace std;
 using namespace chrono;
 
-const double FOOD_PROBABILITY=0.000067;
-const double MAX_FOOD_PART=32;
-const double SNAKE_PROBABILITY=0.000002;
+double FOOD_PROBABILITY=0.000067;
+double MAX_FOOD_PART=32;
+double SNAKE_PROBABILITY=0.000002;
 
-const int SEED=17;
+const int SEED=2;
 
 void generateField(field& field, vector<snake>& snakes, vector<food>& foods)
 {
@@ -72,6 +72,20 @@ void saveData()
     string filename;
     cin>>filename;
     ofstream file(filename.c_str());
+    file<<FIELD_RADIUS<<' ';
+    file<<controller::VF_RADIUS<<' ';
+    file<<controller::VS_RADIUS<<' ';
+    file<<FOOD_PROBABILITY<<' ';
+    file<<MAX_FOOD_PART<<' ';
+    file<<SNAKE_PROBABILITY<<' ';
+    file<<snake::ENERGY_LOSS_SPEED<<' ';
+    file<<snake::DECOMPOSITION_SPEED<<' ';
+    file<<snake::BIRTH_SPEED<<' ';
+    file<<snake::DEFENCE_MULTIPLYER<<' ';
+    file<<snake::DEFENCE_ADDER<<' ';
+    file<<snake::MIN_SPLIT_LENGTH<<' ';
+    file<<snake::MIN_LENGTH<<' ';
+    file<<MAX_MUTATION<<' ';
     file<<foods[cv].size()<<' ';
     for (int i=0;i<foods[cv].size();++i)
     {
@@ -105,6 +119,23 @@ void loadData()
     int s;
     string type;
     string in="";
+    file>>s;
+    if (s!=FIELD_RADIUS) return;
+    file>>s;
+    if (s!=controller::VF_RADIUS) return;
+    file>>s;
+    if (s!=controller::VS_RADIUS) return;
+    file>>FOOD_PROBABILITY;
+    file>>MAX_FOOD_PART;
+    file>>SNAKE_PROBABILITY;
+    file>>snake::ENERGY_LOSS_SPEED;
+    file>>snake::DECOMPOSITION_SPEED;
+    file>>snake::BIRTH_SPEED;
+    file>>snake::DEFENCE_MULTIPLYER;
+    file>>snake::DEFENCE_ADDER;
+    file>>snake::MIN_SPLIT_LENGTH;
+    file>>snake::MIN_LENGTH;
+    file>>MAX_MUTATION;
     file>>s;
     foods[cv].resize(s);
     for (int i=0;i<foods[cv].size();++i)
@@ -149,10 +180,11 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     point p;
     food curr_food;
     int food_gained;
-    double speed=0.05;
+    double speed=0;
     int player=-2;
     int curr_net=-1;
     double attack,blue,green;
+    int flashing=0;
 
     /*cout<<"Enter attack (0-1): ";
     cin>>attack;
@@ -175,6 +207,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     start_time=high_resolution_clock::now();
     while (!glfwWindowShouldClose(sim) && !glfwWindowShouldClose(net))
     {
+        flashing=(flashing+1)%10;
         if (curr_net>=snakes[cv].size()) curr_net=-1;
         if (new_neural_network || curr_net==-1 || snakes[cv][curr_net].dead)
         {
@@ -209,7 +242,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         if (curr_net!=-1) values=snakes[cv][curr_net].ctr->getValues();
         else values={};
         if (draw_neural_net) drawNetWindow(net,values,draw_neural_net_mode);
-        if (draw_sim) drawWindow(sim,snakes[cv],foods[cv]);
+        if (draw_sim) drawWindow(sim,snakes[cv],foods[cv],flashing<5?curr_net:-1);
         do
         {
             glfwPollEvents();

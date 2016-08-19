@@ -153,7 +153,7 @@ decision ctrNeuralNetwork::decodeOutputs()
     else decision.turn_left=0;
     if (neurons[topology.size()-1][curr++]>=action_treshhold) decision.split=1;
     else decision.split=0;
-    decision.split_length=round((body_length-1)*neurons[topology.size()-1][curr++]);
+    decision.split_length=round(body_length*neurons[topology.size()-1][curr++]);
     return decision;
 }
 void ctrNeuralNetwork::forwardPropagate()

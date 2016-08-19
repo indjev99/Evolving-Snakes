@@ -3,15 +3,15 @@
 #include "../headers/randomisation.h"
 #include<stdlib.h>
 
-const int snake::ENERGY_LOSS_SPEED=50;
-const int snake::DECOMPOSITION_SPEED=10;
-const int snake::BIRTH_SPEED=20;
+int snake::ENERGY_LOSS_SPEED=50;
+int snake::DECOMPOSITION_SPEED=10;
+int snake::BIRTH_SPEED=20;
 
-const double snake::DEFENCE_MULTIPLYER=1;
-const double snake::DEFENCE_ADDER=1;
+double snake::DEFENCE_MULTIPLYER=1;
+double snake::DEFENCE_ADDER=1;
 
-const int snake::MIN_SPLIT_LENGTH=10;
-const int snake::MIN_LENGTH=4;
+int snake::MIN_SPLIT_LENGTH=10;
+int snake::MIN_LENGTH=4;
 
 void snake::randomise(int food, controller* new_ctr)
 {
@@ -103,10 +103,8 @@ std::pair<int, std::vector<block> > snake::think()
     direction%=4;
 
     int x1,y1,x2,y2;
-    if (decision.split && blocks.size()>=MIN_SPLIT_LENGTH && decision.split_length>0)
+    if (decision.split && blocks.size()>=MIN_SPLIT_LENGTH && decision.split_length>=MIN_LENGTH && blocks.size()-decision.split_length>=MIN_LENGTH)
     {
-        if (decision.split_length>blocks.size()-MIN_LENGTH) decision.split_length=blocks.size()-MIN_LENGTH;
-        if (decision.split_length<MIN_LENGTH) decision.split_length=MIN_LENGTH;
         x1=blocks[blocks.size()-1].x;
         y1=blocks[blocks.size()-1].y;
         x2=blocks[blocks.size()-2].x;

@@ -9,7 +9,7 @@
 void drawPartEllipse(float x, float y, float radiusX, float radiusY, double alpha, double beta);
 void drawGridSquare(int x, int y, double colour_r, double colour_g, double colour_b, double thickness);
 void drawGrid(double colour_r, double colour_g, double colour_b, double thickness);
-void drawSnake(snake& s);
+void drawSnake(snake& s, bool selected);
 void drawFood(food& f);
-void drawWindow(GLFWwindow* w, std::vector<snake>& snakes, std::vector<food>& foods);
+void drawWindow(GLFWwindow* w, std::vector<snake>& snakes, std::vector<food>& foods, int selected);
 #endif // DRAW_H_INCLUDED

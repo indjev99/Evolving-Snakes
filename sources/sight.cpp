@@ -21,12 +21,12 @@ void seeAll(field& field, snake& s)
 {
     std::pair<int, bool> res;
     int dir;
-    for (int i=0;i<=2*VF_RADIUS;++i)
+    for (int i=0;i<=2*controller::VF_RADIUS;++i)
     {
         s.ctr->VF_dist[i]=-1;
         s.ctr->VF_food[i]=0;
     }
-    for (int i=0;i<=2*VS_RADIUS;++i)
+    for (int i=0;i<=2*controller::VS_RADIUS;++i)
     {
         s.ctr->VR_dist[i]=-1;
         s.ctr->VR_food[i]=0;
@@ -35,56 +35,56 @@ void seeAll(field& field, snake& s)
     }
     dir=(s.direction+1)%4;
     point p=s.blocks[0]+s.direction;
-    for (int i=0;i<=VF_RADIUS;++i)
+    for (int i=0;i<=controller::VF_RADIUS;++i)
     {
         res=seeOne(field,p,s.direction);
-        s.ctr->VF_dist[VF_RADIUS+i]=res.first;
-        s.ctr->VF_food[VF_RADIUS+i]=res.second;
+        s.ctr->VF_dist[controller::VF_RADIUS+i]=res.first;
+        s.ctr->VF_food[controller::VF_RADIUS+i]=res.second;
         if (!field[p.x+FIELD_RADIUS][p.y+FIELD_RADIUS].empty()) break;
         p+=dir;
     }
     p=s.blocks[0]+s.direction;
-    for (int i=0;i<=VF_RADIUS;++i)
+    for (int i=0;i<=controller::VF_RADIUS;++i)
     {
         res=seeOne(field,p,s.direction);
-        s.ctr->VF_dist[VF_RADIUS-i]=res.first;
-        s.ctr->VF_food[VF_RADIUS-i]=res.second;
+        s.ctr->VF_dist[controller::VF_RADIUS-i]=res.first;
+        s.ctr->VF_food[controller::VF_RADIUS-i]=res.second;
         if (!field[p.x+FIELD_RADIUS][p.y+FIELD_RADIUS].empty()) break;
         p-=dir;
     }
     p=s.blocks[0]+dir;
-    for (int i=0;i<=VS_RADIUS;++i)
+    for (int i=0;i<=controller::VS_RADIUS;++i)
     {
         res=seeOne(field,p,dir);
-        s.ctr->VR_dist[VS_RADIUS+i]=res.first;
-        s.ctr->VR_food[VS_RADIUS+i]=res.second;
+        s.ctr->VR_dist[controller::VS_RADIUS+i]=res.first;
+        s.ctr->VR_food[controller::VS_RADIUS+i]=res.second;
         if (!field[p.x+FIELD_RADIUS][p.y+FIELD_RADIUS].empty()) break;
         p+=s.direction;
     }
     p=s.blocks[0]+dir;
-    for (int i=0;i<=VS_RADIUS;++i)
+    for (int i=0;i<=controller::VS_RADIUS;++i)
     {
         res=seeOne(field,p,dir);
-        s.ctr->VR_dist[VS_RADIUS-i]=res.first;
-        s.ctr->VR_food[VS_RADIUS-i]=res.second;
+        s.ctr->VR_dist[controller::VS_RADIUS-i]=res.first;
+        s.ctr->VR_food[controller::VS_RADIUS-i]=res.second;
         if (!field[p.x+FIELD_RADIUS][p.y+FIELD_RADIUS].empty()) break;
         p-=s.direction;
     }
     p=s.blocks[0]-dir;
-    for (int i=0;i<=VS_RADIUS;++i)
+    for (int i=0;i<=controller::VS_RADIUS;++i)
     {
         res=seeOne(field,p,(dir+2)%4);
-        s.ctr->VL_dist[VS_RADIUS+i]=res.first;
-        s.ctr->VL_food[VS_RADIUS+i]=res.second;
+        s.ctr->VL_dist[controller::VS_RADIUS+i]=res.first;
+        s.ctr->VL_food[controller::VS_RADIUS+i]=res.second;
         if (!field[p.x+FIELD_RADIUS][p.y+FIELD_RADIUS].empty()) break;
         p+=s.direction;
     }
     p=s.blocks[0]-dir;
-    for (int i=0;i<=VS_RADIUS;++i)
+    for (int i=0;i<=controller::VS_RADIUS;++i)
     {
         res=seeOne(field,p,(dir+2)%4);
-        s.ctr->VL_dist[VS_RADIUS-i]=res.first;
-        s.ctr->VL_food[VS_RADIUS-i]=res.second;
+        s.ctr->VL_dist[controller::VS_RADIUS-i]=res.first;
+        s.ctr->VL_food[controller::VS_RADIUS-i]=res.second;
         if (!field[p.x+FIELD_RADIUS][p.y+FIELD_RADIUS].empty()) break;
         p-=s.direction;
     }

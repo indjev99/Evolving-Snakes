@@ -7,9 +7,9 @@
 #include<vector>
 #include<GLFW/glfw3.h>
 
-extern const double FOOD_PROBABILITY;
-extern const double MAX_FOOD_PART;
-extern const double SNAKE_PROBABILITY;
+extern double FOOD_PROBABILITY;
+extern double MAX_FOOD_PART;
+extern double SNAKE_PROBABILITY;
 
 extern const int SEED;
 

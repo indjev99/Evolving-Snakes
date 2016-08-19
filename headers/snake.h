@@ -7,15 +7,15 @@
 
 struct snake
 {
-    static const int ENERGY_LOSS_SPEED;
-    static const int DECOMPOSITION_SPEED;
-    static const int BIRTH_SPEED;
+    static int ENERGY_LOSS_SPEED;
+    static int DECOMPOSITION_SPEED;
+    static int BIRTH_SPEED;
 
-    static const double DEFENCE_MULTIPLYER;
-    static const double DEFENCE_ADDER;
+    static double DEFENCE_MULTIPLYER;
+    static double DEFENCE_ADDER;
 
-    static const int MIN_SPLIT_LENGTH;
-    static const int MIN_LENGTH;
+    static int MIN_SPLIT_LENGTH;
+    static int MIN_LENGTH;
 
     std::vector<block> blocks;
     double colour_r, colour_g, colour_b;
