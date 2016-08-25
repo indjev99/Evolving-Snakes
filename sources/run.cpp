@@ -56,7 +56,7 @@ controller* selectRandomController()
     int res=rand()%2;
     //if (res<4) return new ctrRandom();
     //if (res) return new ctrNeuralNetwork({0});
-    return new ctrNeuralNetwork({1,8,6});
+    return new ctrNeuralNetwork({2,20,20,20});
 }
 vector<snake> snakes[2];
 vector<food> foods[2];
@@ -110,13 +110,41 @@ void saveData()
         file<<"end"<<' ';
     }
 }
-void loadData()
+void loadData(string filename="", bool first=1)
 {
-    string filename;
-    cin>>filename;
+    bool only_settings=0;
+    bool no_settings=0;
+    if (filename=="") cin>>filename;
+    if (filename=="") return;
+    if (filename[0]=='/')
+    {
+        filename=filename.substr(1);
+    }
+    else if (filename[0]=='-')
+    {
+        only_settings=1;
+        filename=filename.substr(1);
+        if (filename!="" && filename[0]=='+')
+        {
+            only_settings=0;
+            no_settings=1;
+            filename=filename.substr(1);
+        }
+    }
+    for (int i=0;i<filename.size();++i)
+    {
+        if (filename[i]=='+')
+        {
+            first=0;
+            if (i<filename.size()-1) loadData(filename.substr(i+1),i);
+            filename=filename.substr(0,i);
+            break;
+        }
+    }
     ifstream file(filename.c_str());
     if (!file) return;
     int s;
+    double s2;
     string type;
     string in="";
     file>>s;
@@ -125,26 +153,65 @@ void loadData()
     if (s!=controller::VF_RADIUS) return;
     file>>s;
     if (s!=controller::VS_RADIUS) return;
-    file>>FOOD_PROBABILITY;
-    file>>MAX_FOOD_PART;
-    file>>SNAKE_PROBABILITY;
-    file>>snake::ENERGY_LOSS_SPEED;
-    file>>snake::DECOMPOSITION_SPEED;
-    file>>snake::BIRTH_SPEED;
-    file>>snake::DEFENCE_MULTIPLYER;
-    file>>snake::DEFENCE_ADDER;
-    file>>snake::MIN_SPLIT_LENGTH;
-    file>>snake::MIN_LENGTH;
-    file>>MAX_MUTATION;
+    if (no_settings)
+    {
+        file>>s2;
+        file>>s2;
+        file>>s2;
+        file>>s;
+        file>>s;
+        file>>s;
+        file>>s2;
+        file>>s2;
+        file>>s;
+        file>>s;
+        file>>s2;
+    }
+    else
+    {
+        file>>FOOD_PROBABILITY;
+        file>>MAX_FOOD_PART;
+        file>>SNAKE_PROBABILITY;
+        file>>snake::ENERGY_LOSS_SPEED;
+        file>>snake::DECOMPOSITION_SPEED;
+        file>>snake::BIRTH_SPEED;
+        file>>snake::DEFENCE_MULTIPLYER;
+        file>>snake::DEFENCE_ADDER;
+        file>>snake::MIN_SPLIT_LENGTH;
+        file>>snake::MIN_LENGTH;
+        file>>MAX_MUTATION;
+    }
+    if (only_settings)
+    {
+        if (first)
+        {
+            foods[cv].resize(0);
+            snakes[cv].resize(0);
+        }
+        return;
+    }
+    int start;
+    start=0;
     file>>s;
-    foods[cv].resize(s);
-    for (int i=0;i<foods[cv].size();++i)
+    if (first) foods[cv].resize(s);
+    else
+    {
+        start=foods[cv].size();
+        foods[cv].resize(start+s);
+    }
+    for (int i=start;i<foods[cv].size();++i)
     {
         file>>foods[cv][i].colour_r>>foods[cv][i].colour_g>>foods[cv][i].colour_b>>foods[cv][i].x>>foods[cv][i].y;
     }
     file>>s;
-    snakes[cv].resize(s);
-    for (int i=0;i<snakes[cv].size();++i)
+    start=0;
+    if (first) snakes[cv].resize(s);
+    else
+    {
+        start=snakes[cv].size();
+        snakes[cv].resize(start+s);
+    }
+    for (int i=start;i<snakes[cv].size();++i)
     {
         file>>snakes[cv][i].attack>>snakes[cv][i].defence>>snakes[cv][i].colour_r>>snakes[cv][i].colour_g>>snakes[cv][i].colour_b>>snakes[cv][i].dead>>snakes[cv][i].to_next_loss;
         file>>s;
@@ -180,7 +247,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     point p;
     food curr_food;
     int food_gained;
-    double speed=0;
+    double speed=0.0;
     int player=-2;
     int curr_net=-1;
     double attack,blue,green;
@@ -242,7 +309,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         if (curr_net!=-1) values=snakes[cv][curr_net].ctr->getValues();
         else values={};
         if (draw_neural_net) drawNetWindow(net,values,draw_neural_net_mode);
-        if (draw_sim) drawWindow(sim,snakes[cv],foods[cv],flashing<5?curr_net:-1);
+        if (draw_sim) drawWindow(sim,snakes[cv],foods[cv],flashing<5 && draw_neural_net?curr_net:-1);
         do
         {
             glfwPollEvents();
@@ -258,6 +325,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             change_settings=0;
             save_data=0;
             load_data=0;
+            reset=0;
         }
         if (save_data)
         {
@@ -266,6 +334,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             change_settings=0;
             save_data=0;
             load_data=0;
+            reset=0;
         }
         if (load_data)
         {
@@ -274,6 +343,17 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             change_settings=0;
             save_data=0;
             load_data=0;
+            reset=0;
+        }
+        if (reset)
+        {
+            snakes[cv].resize(0);
+            foods[cv].resize(0);
+            glfwPollEvents();
+            change_settings=0;
+            save_data=0;
+            load_data=0;
+            reset=0;
         }
         if (paused) continue;
         start_time=high_resolution_clock::now();
@@ -575,7 +655,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                 if (snakes[cv][i].dead>=0)
                 {
                     snakes[cv][i].die(0);
-                    cerr<<"WARNING: Snake "<<i<<" not killed but removed."<<endl;
+                    //cerr<<"WARNING: Snake "<<i<<" not killed but removed."<<endl;
                 }
                 ++rem_ind;
             }

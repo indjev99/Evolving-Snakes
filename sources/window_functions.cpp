@@ -15,6 +15,7 @@ bool draw_neural_net=1;
 bool draw_neural_net_mode=0;
 bool save_data=0;
 bool load_data=0;
+bool reset=0;
 
 void errorCallback(int error, const char* description)
 {
@@ -70,6 +71,10 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     if ((key==GLFW_KEY_F8) && action==GLFW_PRESS)
     {
         load_data=1;
+    }
+    if ((key==GLFW_KEY_F9) && action==GLFW_PRESS)
+    {
+        reset=1;
     }
 }
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
