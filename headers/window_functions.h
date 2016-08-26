@@ -18,6 +18,7 @@ extern bool draw_neural_net_mode;
 extern bool save_data;
 extern bool load_data;
 extern bool reset;
+extern bool control;
 
 void errorCallback(int error, const char* description);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);

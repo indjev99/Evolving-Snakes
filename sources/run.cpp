@@ -53,10 +53,10 @@ void generateField(field& field, vector<snake>& snakes, vector<food>& foods)
 }
 controller* selectRandomController()
 {
-    int res=rand()%2;
+    //int res=rand()%2;
     //if (res<4) return new ctrRandom();
     //if (res) return new ctrNeuralNetwork({0});
-    return new ctrNeuralNetwork({2,20,20,20});
+    return new ctrNeuralNetwork({2,15,15});
 }
 vector<snake> snakes[2];
 vector<food> foods[2];
@@ -248,7 +248,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     food curr_food;
     int food_gained;
     double speed=0.0;
-    int player=-2;
+    int player=-1;
     int curr_net=-1;
     double attack,blue,green;
     int flashing=0;
@@ -318,9 +318,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         while(!glfwWindowShouldClose(sim) && !glfwWindowShouldClose(net) && duration_cast<duration<double>>(curr_time-start_time).count()<speed);
         if (change_settings)
         {
-            cin>>speed>>player;
-            if (!player) player=-2;
-            else player=-1;
+            cin>>speed;
             glfwPollEvents();
             change_settings=0;
             save_data=0;
@@ -390,9 +388,9 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                 }
             }
         }
-        if (player!=-2)
+        player=-1;
+        if (control)
         {
-            player=-1;
             for (int i=0;i<snakes[cv].size();++i)
             {
                 if (!snakes[cv][i].dead)
