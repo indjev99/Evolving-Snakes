@@ -247,7 +247,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     point p;
     food curr_food;
     int food_gained;
-    double speed=0.0;
+    double speed=0.03;
     int player=-1;
     int curr_net=-1;
     double attack,blue,green;
