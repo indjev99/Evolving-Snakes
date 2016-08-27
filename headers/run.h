@@ -17,6 +17,7 @@ void generateField(field& field, std::vector<snake>& snakes, std::vector<point>&
 controller* selectRandomController();
 void saveData();
 void loadData(std::string filename, bool first);
+void resetData();
 void run(GLFWwindow* sim, GLFWwindow* net);
 
 #endif // RUN_H_INCLUDED

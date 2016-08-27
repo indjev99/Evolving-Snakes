@@ -11,7 +11,7 @@ struct snake
     static int DECOMPOSITION_SPEED;
     static int BIRTH_SPEED;
 
-    static double DEFENCE_MULTIPLYER;
+    static double DEFENCE_MULTIPLIER;
     static double DEFENCE_ADDER;
 
     static int MIN_SPLIT_LENGTH;

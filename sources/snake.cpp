@@ -7,7 +7,7 @@ int snake::ENERGY_LOSS_SPEED=50;
 int snake::DECOMPOSITION_SPEED=10;
 int snake::BIRTH_SPEED=20;
 
-double snake::DEFENCE_MULTIPLYER=1;
+double snake::DEFENCE_MULTIPLIER=1;
 double snake::DEFENCE_ADDER=1;
 
 int snake::MIN_SPLIT_LENGTH=10;
@@ -21,7 +21,7 @@ void snake::randomise(int food, controller* new_ctr)
     blocks[0].food=food;
     direction=rand()%4;
     randomiseVariable(attack,0,1);
-    defence=(1-attack)*DEFENCE_MULTIPLYER+DEFENCE_ADDER;
+    defence=(1-attack)*DEFENCE_MULTIPLIER+DEFENCE_ADDER;
     colour_r=attack;
     randomiseVariable(colour_g,0,1);
     randomiseVariable(colour_b,0,1);
@@ -216,7 +216,7 @@ void snake::mutate()
 {
     direction=rand()%4;
     mutateVariable(attack,0,1);
-    defence=(1-attack)*DEFENCE_MULTIPLYER+DEFENCE_ADDER;
+    defence=(1-attack)*DEFENCE_MULTIPLIER+DEFENCE_ADDER;
     colour_r=attack;
     mutateVariable(colour_g,0,1);
     mutateVariable(colour_b,0,1);

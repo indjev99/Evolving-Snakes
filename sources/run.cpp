@@ -81,7 +81,7 @@ void saveData()
     file<<snake::ENERGY_LOSS_SPEED<<' ';
     file<<snake::DECOMPOSITION_SPEED<<' ';
     file<<snake::BIRTH_SPEED<<' ';
-    file<<snake::DEFENCE_MULTIPLYER<<' ';
+    file<<snake::DEFENCE_MULTIPLIER<<' ';
     file<<snake::DEFENCE_ADDER<<' ';
     file<<snake::MIN_SPLIT_LENGTH<<' ';
     file<<snake::MIN_LENGTH<<' ';
@@ -109,6 +109,37 @@ void saveData()
         }
         file<<"end"<<' ';
     }
+}
+void resetData()
+{
+    foods[cv].resize(0);
+    snakes[cv].resize(0);
+    char answer;
+    cout<<"Change settings? (Y/N): ";
+    cin>>answer;
+    if (answer!='y' && answer!='Y') return;
+    cout<<"Probability of food appearing ("<<FOOD_PROBABILITY<<"): ";
+    cin>>FOOD_PROBABILITY;
+    cout<<"Maximum food concentration (1/x) ("<<MAX_FOOD_PART<<"): ";
+    cin>>MAX_FOOD_PART;
+    cout<<"Probability of snake appearing ("<<SNAKE_PROBABILITY<<"): ";
+    cin>>SNAKE_PROBABILITY;
+    cout<<"Energy loss speed (1/x) ("<<snake::ENERGY_LOSS_SPEED<<"): ";
+    cin>>snake::ENERGY_LOSS_SPEED;
+    cout<<"Decomposition speed (1/x) ("<<snake::DECOMPOSITION_SPEED<<"): ";
+    cin>>snake::DECOMPOSITION_SPEED;
+    cout<<"Birth speed (1/x) ("<<snake::BIRTH_SPEED<<"): ";
+    cin>>snake::BIRTH_SPEED;
+    cout<<"Defence multiplier ("<<snake::DEFENCE_MULTIPLIER<<"): ";
+    cin>>snake::DEFENCE_MULTIPLIER;
+    cout<<"Defence adder ("<<snake::DEFENCE_ADDER<<"): ";
+    cin>>snake::DEFENCE_ADDER;
+    cout<<"Minimum length to split ("<<snake::MIN_SPLIT_LENGTH<<"): ";
+    cin>>snake::MIN_SPLIT_LENGTH;
+    cout<<"Minimum length of split part ("<<snake::MIN_LENGTH<<"): ";
+    cin>>snake::MIN_LENGTH;
+    cout<<"Maximum mutation ("<<MAX_MUTATION<<"): ";
+    cin>>MAX_MUTATION;
 }
 void loadData(string filename="", bool first=1)
 {
@@ -175,7 +206,7 @@ void loadData(string filename="", bool first=1)
         file>>snake::ENERGY_LOSS_SPEED;
         file>>snake::DECOMPOSITION_SPEED;
         file>>snake::BIRTH_SPEED;
-        file>>snake::DEFENCE_MULTIPLYER;
+        file>>snake::DEFENCE_MULTIPLIER;
         file>>snake::DEFENCE_ADDER;
         file>>snake::MIN_SPLIT_LENGTH;
         file>>snake::MIN_LENGTH;
@@ -252,6 +283,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     int curr_net=-1;
     double attack,blue,green;
     int flashing=0;
+    int benchmark_counter=0;
 
     /*cout<<"Enter attack (0-1): ";
     cin>>attack;
@@ -270,10 +302,19 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         s.randomise(3,selectRandomController());
         snakes[cv].push_back(s);
     }
-    high_resolution_clock::time_point start_time,curr_time;
+    high_resolution_clock::time_point start_time,curr_time,benchmark_start_time;
     start_time=high_resolution_clock::now();
+    benchmark_start_time=start_time;
     while (!glfwWindowShouldClose(sim) && !glfwWindowShouldClose(net))
     {
+        ++benchmark_counter;
+        if (benchmark_counter==1000)
+        {
+            curr_time=high_resolution_clock::now();
+            cout<<"Time for last 1000 steps: "<<duration_cast<duration<double>>(curr_time-benchmark_start_time).count()<<'\n';
+            benchmark_start_time=curr_time;
+            benchmark_counter=0;
+        }
         flashing=(flashing+1)%10;
         if (curr_net>=snakes[cv].size()) curr_net=-1;
         if (new_neural_network || curr_net==-1 || snakes[cv][curr_net].dead)
@@ -345,8 +386,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         }
         if (reset)
         {
-            snakes[cv].resize(0);
-            foods[cv].resize(0);
+            resetData();
             glfwPollEvents();
             change_settings=0;
             save_data=0;
