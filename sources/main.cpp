@@ -32,6 +32,6 @@ int main()
     system("cls");
     run(sim,net);
 
-    stopGraphics({sim});
+    stopGraphics({sim,net});
     return 0;
 }
