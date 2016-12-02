@@ -1,6 +1,7 @@
 #include "../headers/run.h"
 #include "../headers/snake.h"
 #include "../headers/ctrRandom.h"
+#include "../headers/ctrBasic.h"
 #include "../headers/ctrNeuralNetwork.h"
 #include "../headers/sight.h"
 #include "../headers/draw.h"
@@ -56,7 +57,8 @@ controller* selectRandomController()
     //int res=rand()%2;
     //if (res<4) return new ctrRandom();
     //if (res) return new ctrNeuralNetwork({0});
-    return new ctrNeuralNetwork({2,15,15});
+    if (rand()%2) return new ctrNeuralNetwork({2,15,15});
+    else return new ctrBasic();
 }
 vector<snake> snakes[2];
 vector<food> foods[2];
@@ -261,13 +263,10 @@ void loadData(string filename="", bool first=1)
             file>>in;
         }
         if (type=="random") snakes[cv][i].ctr=new ctrRandom();
-        else if (type=="neuralNetwork")
-        {
-            ctrNeuralNetwork nn;
-            nn.setValues(values);
-            snakes[cv][i].ctr=nn.clone();
-        }
+        else if (type=="basic") snakes[cv][i].ctr=new ctrBasic();
+        else if (type=="neuralNetwork") snakes[cv][i].ctr=new ctrNeuralNetwork();
         else snakes[cv][i].ctr=new ctrRandom();
+        snakes[cv][i].ctr->setValues(values);
     }
 }
 void run(GLFWwindow* sim, GLFWwindow* net)
@@ -317,7 +316,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         }
         flashing=(flashing+1)%10;
         if (curr_net>=snakes[cv].size()) curr_net=-1;
-        if (new_neural_network || curr_net==-1 || snakes[cv][curr_net].dead)
+        if (new_neural_network || curr_net==-1 || snakes[cv][curr_net].dead || snakes[cv][curr_net].ctr->getType()!="neuralNetwork")
         {
             int start_net=curr_net;
             ++curr_net;

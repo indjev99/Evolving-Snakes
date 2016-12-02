@@ -15,16 +15,17 @@ struct controller
 
     int VF_dist[1+2*VF_RADIUS];
     bool VF_food[1+2*VF_RADIUS];
-    int VL_dist[1+2*VS_RADIUS];
-    bool VL_food[1+2*VS_RADIUS];
     int VR_dist[1+2*VS_RADIUS];
     bool VR_food[1+2*VS_RADIUS];
+    int VL_dist[1+2*VS_RADIUS];
+    bool VL_food[1+2*VS_RADIUS];
 
     int body_length;
     int energy;
 
     virtual std::string getType() =0;
     virtual std::vector<double> getValues() =0;
+    virtual void setValues(std::vector<double>& values) =0;
     virtual controller* clone() =0;
     virtual void randomise() =0;
     virtual void mutate() =0;

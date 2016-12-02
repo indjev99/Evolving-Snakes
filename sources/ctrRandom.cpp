@@ -10,6 +10,8 @@ std::vector<double> ctrRandom::getValues()
 {
     return {};
 }
+
+void ctrRandom::setValues(std::vector<double>& values) {}
 ctrRandom* ctrRandom::clone()
 {
     return new ctrRandom(*this);

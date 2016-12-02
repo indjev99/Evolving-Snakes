@@ -49,6 +49,7 @@
 		<Unit filename="headers/block.h" />
 		<Unit filename="headers/colours.h" />
 		<Unit filename="headers/controller.h" />
+		<Unit filename="headers/ctrBasic.h" />
 		<Unit filename="headers/ctrNeuralNetwork.h" />
 		<Unit filename="headers/ctrRandom.h" />
 		<Unit filename="headers/decision.h" />
@@ -66,6 +67,7 @@
 		<Unit filename="headers/window_size.h" />
 		<Unit filename="sources/colours.cpp" />
 		<Unit filename="sources/controller.cpp" />
+		<Unit filename="sources/ctrBasic.cpp" />
 		<Unit filename="sources/ctrNeuralNetwork.cpp" />
 		<Unit filename="sources/ctrRandom.cpp" />
 		<Unit filename="sources/draw.cpp" />
