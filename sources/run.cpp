@@ -57,8 +57,9 @@ controller* selectRandomController()
     //int res=rand()%2;
     //if (res<4) return new ctrRandom();
     //if (res) return new ctrNeuralNetwork({0});
-    return new ctrNeuralNetwork({2,15,15});
+    //return new ctrNeuralNetwork({2,15,15});
     //return new ctrBasic();
+    return new ctrNeuralNetwork({1,8,6});
 }
 vector<snake> snakes[2];
 vector<food> foods[2];
