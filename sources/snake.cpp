@@ -8,7 +8,7 @@ int snake::DECOMPOSITION_SPEED=10;
 int snake::BIRTH_SPEED=20;
 
 double snake::DEFENCE_MULTIPLIER=1;
-double snake::DEFENCE_ADDER=1;
+double snake::DEFENCE_ADDER=0;
 
 int snake::MIN_SPLIT_LENGTH=10;
 int snake::MIN_LENGTH=4;

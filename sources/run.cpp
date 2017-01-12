@@ -351,6 +351,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         else values={};
         if (draw_neural_net) drawNetWindow(net,values,draw_neural_net_mode);
         if (draw_sim) drawWindow(sim,snakes[cv],foods[cv],flashing<5 && draw_neural_net?curr_net:-1);
+        start_time=high_resolution_clock::now();
         do
         {
             glfwPollEvents();
