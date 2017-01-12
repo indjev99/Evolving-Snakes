@@ -40,13 +40,13 @@ void drawNet(GLFWwindow* w, std::vector<double>& values, bool mode)
                 {
                     over=weight-1;
                     if (over<0) over=0;
-                    glColor4f(1,over,BACKGROUND_COLOUR_B,weight);
+                    glColor4f(1,over,0,weight);
                 }
                 else
                 {
                     over=-weight-1;
                     if (over<0) over=0;
-                    glColor4f(BACKGROUND_COLOUR_R,over,1,-weight);
+                    glColor4f(0,over,1,-weight);
                 }
                 glVertex2d(x-dx,y2);
                 glVertex2d(x,y);
@@ -68,9 +68,11 @@ void drawNet(GLFWwindow* w, std::vector<double>& values, bool mode)
         for (int j=0;j<nn.topology[i];++j)
         {
             y-=dy;
-            glColor3f(nn.neurons[i][j],nn.neurons[i][j],nn.neurons[i][j]);
             radius=dy/4;
             if (dx/4<radius) radius=dx/4;
+            glColor3f(NN_OUTLINE_COLOUR_R,NN_OUTLINE_COLOUR_G,NN_OUTLINE_COLOUR_B);
+            drawPartEllipse(x,y,radius*1.075,radius*1.075,0,360);
+            glColor3f(nn.neurons[i][j],nn.neurons[i][j],nn.neurons[i][j]);
             drawPartEllipse(x,y,radius,radius,0,360);
         }
     }
@@ -93,14 +95,14 @@ void drawNetWindow(GLFWwindow* w, std::vector<double>& values, bool mode)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glColor3f(BACKGROUND_COLOUR_R,BACKGROUND_COLOUR_G,BACKGROUND_COLOUR_B);
+    glColor3f(NN_BACKGROUND_COLOUR_R,NN_BACKGROUND_COLOUR_G,NN_BACKGROUND_COLOUR_B);
 
     glBegin(GL_QUADS);
 
-    glVertex2f(-1.0,-1.0);
-    glVertex2f(1.0,-1.0);
-    glVertex2f(1.0,1.0);
-    glVertex2f(-1.0,1.0);
+    glVertex2f(-4.0,-1.0);
+    glVertex2f(4.0,-1.0);
+    glVertex2f(4.0,1.0);
+    glVertex2f(-4.0,1.0);
 
     glEnd();
 
