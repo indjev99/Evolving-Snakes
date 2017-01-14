@@ -4,7 +4,6 @@
 #include<math.h>
 #include<iostream>
 #include<conio.h>
-using namespace std;
 
 std::string ctrBasic::getType()
 {

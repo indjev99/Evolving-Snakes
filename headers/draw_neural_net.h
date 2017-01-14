@@ -4,7 +4,7 @@
 #include<vector>
 #include<GLFW/glfw3.h>
 
-void drawNet(GLFWwindow* w, std::vector<double>& values, bool mode);
-void drawNetWindow(GLFWwindow* w, std::vector<double>& values, bool mode);
+void drawNet(GLFWwindow* w, std::vector<double>& values, int mode);
+void drawNetWindow(GLFWwindow* w, std::vector<double>& values, int mode);
 
 #endif // DRAW_NEURAL_NET_H_INCLUDED

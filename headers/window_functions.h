@@ -14,7 +14,7 @@ extern bool new_neural_network;
 extern bool change_settings;
 extern bool draw_sim;
 extern bool draw_neural_net;
-extern bool draw_neural_net_mode;
+extern int draw_neural_net_mode;
 extern bool save_data;
 extern bool load_data;
 extern bool reset;

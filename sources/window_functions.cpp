@@ -12,7 +12,7 @@ bool new_neural_network=0;
 bool change_settings=0;
 bool draw_sim=1;
 bool draw_neural_net=1;
-bool draw_neural_net_mode=0;
+int draw_neural_net_mode=0;
 bool save_data=0;
 bool load_data=0;
 bool reset=0;
@@ -59,7 +59,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
     if ((key==GLFW_KEY_F5) && action==GLFW_PRESS)
     {
-        draw_neural_net_mode=!draw_neural_net_mode;
+        draw_neural_net_mode=(draw_neural_net_mode+1)%4;
     }
     if ((key==GLFW_KEY_F6) && action==GLFW_PRESS)
     {

@@ -1,6 +1,7 @@
 #include "../headers/run.h"
 #include "../headers/snake.h"
 #include "../headers/ctrRandom.h"
+#include "../headers/ctrRandomEvolving.h"
 #include "../headers/ctrBasic.h"
 #include "../headers/ctrNeuralNetwork.h"
 #include "../headers/sight.h"
@@ -24,7 +25,7 @@ double FOOD_PROBABILITY=0.000067;
 double MAX_FOOD_PART=32;
 double SNAKE_PROBABILITY=0.000002;
 
-const int SEED=2;
+const int SEED=0;
 
 void generateField(field& field, vector<snake>& snakes, vector<food>& foods)
 {
@@ -54,12 +55,11 @@ void generateField(field& field, vector<snake>& snakes, vector<food>& foods)
 }
 controller* selectRandomController()
 {
-    //int res=rand()%2;
-    //if (res<4) return new ctrRandom();
-    //if (res) return new ctrNeuralNetwork({0});
-    //return new ctrNeuralNetwork({2,15,15});
+    //return new ctrRandom();
+    //return new ctrRandomEvolving();
     //return new ctrBasic();
     return new ctrNeuralNetwork({1,8,6});
+    //return new ctrNeuralNetwork({5,20,20,20,20});
 }
 vector<snake> snakes[2];
 vector<food> foods[2];
@@ -264,6 +264,7 @@ void loadData(string filename="", bool first=1)
             file>>in;
         }
         if (type=="random") snakes[cv][i].ctr=new ctrRandom();
+        if (type=="random") snakes[cv][i].ctr=new ctrRandomEvolving();
         else if (type=="basic") snakes[cv][i].ctr=new ctrBasic();
         else if (type=="neuralNetwork") snakes[cv][i].ctr=new ctrNeuralNetwork();
         else snakes[cv][i].ctr=new ctrRandom();
@@ -349,7 +350,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         }
         if (curr_net!=-1) values=snakes[cv][curr_net].ctr->getValues();
         else values={};
-        if (draw_neural_net) drawNetWindow(net,values,draw_neural_net_mode);
+        if (draw_neural_net && curr_net!=-1) drawNetWindow(net,values,draw_neural_net_mode);
         if (draw_sim) drawWindow(sim,snakes[cv],foods[cv],flashing<5 && draw_neural_net?curr_net:-1);
         start_time=high_resolution_clock::now();
         do

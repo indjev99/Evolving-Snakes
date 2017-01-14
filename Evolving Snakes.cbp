@@ -52,6 +52,7 @@
 		<Unit filename="headers/ctrBasic.h" />
 		<Unit filename="headers/ctrNeuralNetwork.h" />
 		<Unit filename="headers/ctrRandom.h" />
+		<Unit filename="headers/ctrRandomEvolving.h" />
 		<Unit filename="headers/decision.h" />
 		<Unit filename="headers/draw.h" />
 		<Unit filename="headers/draw_neural_net.h" />
@@ -70,6 +71,7 @@
 		<Unit filename="sources/ctrBasic.cpp" />
 		<Unit filename="sources/ctrNeuralNetwork.cpp" />
 		<Unit filename="sources/ctrRandom.cpp" />
+		<Unit filename="sources/ctrRandomEvolving.cpp" />
 		<Unit filename="sources/draw.cpp" />
 		<Unit filename="sources/draw_neural_net.cpp" />
 		<Unit filename="sources/food.cpp" />

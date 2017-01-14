@@ -4,11 +4,12 @@
 #include "../headers/window_size.h"
 #include "../headers/ctrNeuralNetwork.h"
 
-void drawNet(GLFWwindow* w, std::vector<double>& values, bool mode)
+void drawNet(GLFWwindow* w, std::vector<double>& values, int mode)
 {
     if (values.empty()) return;
     ctrNeuralNetwork nn;
     nn.setValues(values);
+    if (mode>=2) nn.calcImportance(mode-2);
     double dx,dy,dy2,x,y,y2;
     double weight;
     double over;
@@ -35,7 +36,8 @@ void drawNet(GLFWwindow* w, std::vector<double>& values, bool mode)
             for (int k=0;k<nn.topology[i-1];++k)
             {
                 y2-=dy2;
-                weight=nn.weights[i][j][k]*(mode?nn.neurons[i-1][k]:1);
+                if (mode==1) weight=nn.weights[i][j][k]*nn.neurons[i-1][k];
+                else weight=nn.weights[i][j][k];
                 if (weight>=0)
                 {
                     over=weight-1;
@@ -72,12 +74,13 @@ void drawNet(GLFWwindow* w, std::vector<double>& values, bool mode)
             if (dx/4<radius) radius=dx/4;
             glColor3f(NN_OUTLINE_COLOUR_R,NN_OUTLINE_COLOUR_G,NN_OUTLINE_COLOUR_B);
             drawPartEllipse(x,y,radius*1.075,radius*1.075,0,360);
-            glColor3f(nn.neurons[i][j],nn.neurons[i][j],nn.neurons[i][j]);
+            if (mode>=2) glColor3f(nn.importance[i][j],nn.importance[i][j],nn.importance[i][j]);
+            else glColor3f(nn.neurons[i][j],nn.neurons[i][j],nn.neurons[i][j]);
             drawPartEllipse(x,y,radius,radius,0,360);
         }
     }
 }
-void drawNetWindow(GLFWwindow* w, std::vector<double>& values, bool mode)
+void drawNetWindow(GLFWwindow* w, std::vector<double>& values, int mode)
 {
     glfwSetWindowShouldClose(w,0);
 
