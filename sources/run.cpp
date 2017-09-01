@@ -73,6 +73,7 @@ vector<double> values;
 void saveData()
 {
     string filename;
+    cout<<"Save to file: ";
     cin>>filename;
     ofstream file(filename.c_str());
     file<<FIELD_RADIUS<<' ';
@@ -148,7 +149,12 @@ void loadData(string filename="", bool first=1)
 {
     bool only_settings=0;
     bool no_settings=0;
-    if (filename=="") cin>>filename;
+    if (first==0) no_settings=1;
+    if (filename=="")
+    {
+        cout<<"Load from file(s): ";
+        cin>>filename;
+    }
     if (filename=="") return;
     if (filename[0]=='/')
     {
@@ -158,10 +164,21 @@ void loadData(string filename="", bool first=1)
     {
         only_settings=1;
         filename=filename.substr(1);
-        if (filename!="" && filename[0]=='+')
+    }
+    else if (filename[0]=='+')
+    {
+        first=0;
+        no_settings=1;
+        filename=filename.substr(1);
+        if (filename!="" && filename[0]=='-')
         {
-            only_settings=0;
-            no_settings=1;
+            no_settings=0;
+            only_settings=1;
+            filename=filename.substr(1);
+        }
+        else if (filename!="" && filename[0]=='!')
+        {
+            no_settings=0;
             filename=filename.substr(1);
         }
     }
@@ -169,8 +186,8 @@ void loadData(string filename="", bool first=1)
     {
         if (filename[i]=='+')
         {
+            if (i<filename.size()-1) loadData(filename.substr(i+1),first);
             first=0;
-            if (i<filename.size()-1) loadData(filename.substr(i+1),i);
             filename=filename.substr(0,i);
             break;
         }
@@ -361,6 +378,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         while(!glfwWindowShouldClose(sim) && !glfwWindowShouldClose(net) && duration_cast<duration<double>>(curr_time-start_time).count()<speed);
         if (change_settings)
         {
+            cout<<"Seconds per step/frame: ";
             cin>>speed;
             glfwPollEvents();
             change_settings=0;
