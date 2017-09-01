@@ -18,6 +18,7 @@ Controls:
     * f10 - toggle on/off controlling the selected snake with the arrow keys.
 
 There are more options for the loading:
+
     1. You can load multiple save files at once like this:
         * `save1+save2+save3+...+saveN`
         * The settings of the environment are that of save1.
