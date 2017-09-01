@@ -19,37 +19,25 @@ Controls:
 
 There are more options for the loading:
 
-You can load multiple save files at once like this:
-* save1+save2+save3+...+saveN \\
+1. You can load multiple save files at once like this:
+* 'save1+save2+save3+...+saveN'
 * The settings of the environment are that of save1.
 
-You can load only the settings of a save like this:
-* -save1+save2+save3+...+saveN
+2. You can load only the settings of a save like this:
+* '-save1+save2+save3+...+saveN'
 * The settings of the environment are again that of save1, but its food pieces and snakes are not loaded.
+* Typing only '-save1' will load the settings of save1, but will reset all the food and snakes.
 
-Typing only:
-* -save1
-* will load the settings of save1, but will reset all the food and snakes.
-
-You can also start with a '+':
-* +save1+save2+save3+...+saveN
+3. You can also start with a '+':
+* '+save1+save2+save3+...+saveN'
 * This will load the snakes and food from all save files, but will also keep the current ones. The settings will not change.
 
-If you instead want to change the settings:
-* +-save1+save2+save3+...saveN
+4. If you instead want to change the settings:
+* '+-save1+save2+save3+...saveN'
 * This will load the snakes and food from all save files except save1, but will also keep the current ones. The settings will be those of save1.
 
-Typing only:
-* +-save1
-* will load the settings of save1, but will keep all the current food and snakes.
-
-If you want to change the settings but also load the food snakes:
-* +!save1+save2+save3+...saveN
+5. If you want to change the settings but also load the food snakes:
+* '+!save1+save2+save3+...saveN'
 * This will load the snakes and food from all save files, but will also keep the current ones. The settings will be those of save1.
-
-Typing only:
-* +-save1
-* will load the settings, food and snakes of save1, but will keep all the current food and snakes.
-
 
 P.S. Don't have save files with '+'s, '-'s and '!'s in their names.
