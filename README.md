@@ -5,6 +5,13 @@ Snakes from the classical game are controlled by neural networks and are evolved
 
 This project uses the GLFW library and OpenGL.
 
+Build commands:
+
+For all files: `mingw32-g++.exe -Wall -fexceptions -O2 -std=c++11 -Iinclude -c sources\[.cpp file] -o obj\Debug\sources\[.o file]`
+
+`mingw32-g++.exe -Llib-mingw -o "bin\Debug\Evolving Snakes.exe" obj\Debug\sources\colours.o obj\Debug\sources\controller.o obj\Debug\sources\ctrBasic.o obj\Debug\sources\ctrNeuralNetwork.o obj\Debug\sources\ctrRandom.o obj\Debug\sources\ctrRandomEvolving.o obj\Debug\sources\draw.o obj\Debug\sources\draw_neural_net.o obj\Debug\sources\food.o obj\Debug\sources\main.o obj\Debug\sources\point.o obj\Debug\sources\randomisation.o obj\Debug\sources\run.o obj\Debug\sources\sight.o obj\Debug\sources\snake.o obj\Debug\sources\window_functions.o obj\Debug\sources\window_size.o  -s  -lglfw3 -lgdi32 -lopengl32`
+
+
 Controls:
 * f1 - cycle trough the snakes  (the selected snake will blink; its neural network is shown in the other window)
 * f2 - pause
