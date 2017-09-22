@@ -59,6 +59,7 @@
 		<Unit filename="headers/field.h" />
 		<Unit filename="headers/field_radius.h" />
 		<Unit filename="headers/food.h" />
+		<Unit filename="headers/names.h" />
 		<Unit filename="headers/point.h" />
 		<Unit filename="headers/randomisation.h" />
 		<Unit filename="headers/run.h" />
@@ -76,6 +77,7 @@
 		<Unit filename="sources/draw_neural_net.cpp" />
 		<Unit filename="sources/food.cpp" />
 		<Unit filename="sources/main.cpp" />
+		<Unit filename="sources/names.cpp" />
 		<Unit filename="sources/point.cpp" />
 		<Unit filename="sources/randomisation.cpp" />
 		<Unit filename="sources/run.cpp" />

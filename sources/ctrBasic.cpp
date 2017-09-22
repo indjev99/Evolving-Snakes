@@ -55,6 +55,9 @@ decision ctrBasic::think()
         decision.turn_left=1;
     }
 
+    decision.boost_speed=0;
+    decision.boost_defence=0;
+
     //cerr<<front_score.second<<" "<<right_score.second<<" "<<left_score.second<<"   "<<decision.turn_right<<" "<<decision.turn_left<<endl;
     //if (front_score.second<0 && right_score.second<0 && left_score.second<0) getch();
 

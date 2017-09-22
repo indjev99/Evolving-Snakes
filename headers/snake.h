@@ -7,22 +7,28 @@
 
 struct snake
 {
-    static int ENERGY_LOSS_SPEED;
-    static int DECOMPOSITION_SPEED;
-    static int BIRTH_SPEED;
+    static int MAX_ENERGY;
+    static int DECOMPOSITION_TIME;
+    static int BIRTH_TIME;
 
     static double DEFENCE_MULTIPLIER;
     static double DEFENCE_ADDER;
+    static double DEFENCE_BOOST;
 
     static int MIN_SPLIT_LENGTH;
     static int MIN_LENGTH;
 
-    std::vector<block> blocks;
-    double colour_r, colour_g, colour_b;
-    int direction;
-    int to_next_loss;
+    std::string name;
+    int time_alive;
+
     double defence,attack;
+    double colour_r, colour_g, colour_b;
     int dead;
+    int energy;
+    int direction;
+    bool speed_boost;
+    bool defence_boost;
+    std::vector<block> blocks;
 
     controller* ctr;
 

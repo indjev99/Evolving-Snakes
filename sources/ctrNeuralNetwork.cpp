@@ -3,6 +3,10 @@
 #include "../headers/randomisation.h"
 #include<math.h>
 
+const int inputs=4*controller::VF_RADIUS+8*controller::VS_RADIUS+9;
+const int outputs=6;
+
+
 const int IMPORTANCE_ITERATIONS=10;
 
 ctrNeuralNetwork::ctrNeuralNetwork() {}
@@ -190,6 +194,10 @@ decision ctrNeuralNetwork::decodeOutputs()
     else decision.turn_right=0;
     if (neurons[topology.size()-1][curr++]>=action_treshhold) decision.turn_left=1;
     else decision.turn_left=0;
+    if (neurons[topology.size()-1][curr++]>=action_treshhold) decision.boost_speed=1;
+    else decision.turn_left=0;
+    if (neurons[topology.size()-1][curr++]>=action_treshhold) decision.boost_defence=1;
+    else decision.turn_left=0;
     if (neurons[topology.size()-1][curr++]>=action_treshhold) decision.split=1;
     else decision.split=0;
     decision.split_length=round(body_length*neurons[topology.size()-1][curr++]);
@@ -216,7 +224,7 @@ void ctrNeuralNetwork::loadInputs()
     int curr=0;
     neurons[0][curr++]=1;
     neurons[0][curr++]=1-pow(1-body_length_curve,body_length);
-    neurons[0][curr++]=(energy>=0?1:-1)*(1-pow(1-body_length_curve,fabs(energy)));
+    neurons[0][curr++]=(food_in_body>=0?1:-1)*(1-pow(1-body_length_curve,fabs(food_in_body)));
     for (int i=0; i<=2*VF_RADIUS; ++i)
     {
         if (VF_dist[i]>=0) neurons[0][curr++]=pow(1-sight_distance_curve,VF_dist[i]);

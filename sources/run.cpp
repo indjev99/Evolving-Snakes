@@ -82,9 +82,9 @@ void saveData()
     file<<FOOD_PROBABILITY<<' ';
     file<<MAX_FOOD_PART<<' ';
     file<<SNAKE_PROBABILITY<<' ';
-    file<<snake::ENERGY_LOSS_SPEED<<' ';
-    file<<snake::DECOMPOSITION_SPEED<<' ';
-    file<<snake::BIRTH_SPEED<<' ';
+    file<<snake::MAX_ENERGY<<' ';
+    file<<snake::DECOMPOSITION_TIME<<' ';
+    file<<snake::BIRTH_TIME<<' ';
     file<<snake::DEFENCE_MULTIPLIER<<' ';
     file<<snake::DEFENCE_ADDER<<' ';
     file<<snake::MIN_SPLIT_LENGTH<<' ';
@@ -98,7 +98,7 @@ void saveData()
     file<<snakes[cv].size()<<' ';
     for (int i=0;i<snakes[cv].size();++i)
     {
-        file<<snakes[cv][i].attack<<' '<<snakes[cv][i].defence<<' '<<snakes[cv][i].colour_r<<' '<<snakes[cv][i].colour_g<<' '<<snakes[cv][i].colour_b<<' '<<snakes[cv][i].dead<<' '<<snakes[cv][i].to_next_loss<<' ';
+        file<<snakes[cv][i].name<<' '<<snakes[cv][i].time_alive<<snakes[cv][i].attack<<' '<<snakes[cv][i].defence<<' '<<snakes[cv][i].colour_r<<' '<<snakes[cv][i].colour_g<<' '<<snakes[cv][i].colour_b<<' '<<snakes[cv][i].direction<<' '<<snakes[cv][i].dead<<' '<<snakes[cv][i].energy<<' ';
         file<<snakes[cv][i].blocks.size()<<' ';
         for (int j=0;j<snakes[cv][i].blocks.size();++j)
         {
@@ -128,12 +128,12 @@ void resetData()
     cin>>MAX_FOOD_PART;
     cout<<"Probability of snake appearing ("<<SNAKE_PROBABILITY<<"): ";
     cin>>SNAKE_PROBABILITY;
-    cout<<"Energy loss speed (1/x) ("<<snake::ENERGY_LOSS_SPEED<<"): ";
-    cin>>snake::ENERGY_LOSS_SPEED;
-    cout<<"Decomposition speed (1/x) ("<<snake::DECOMPOSITION_SPEED<<"): ";
-    cin>>snake::DECOMPOSITION_SPEED;
-    cout<<"Birth speed (1/x) ("<<snake::BIRTH_SPEED<<"): ";
-    cin>>snake::BIRTH_SPEED;
+    cout<<"Max energy ("<<snake::MAX_ENERGY<<"): ";
+    cin>>snake::MAX_ENERGY;
+    cout<<"Decomposition time ("<<snake::DECOMPOSITION_TIME<<"): ";
+    cin>>snake::DECOMPOSITION_TIME;
+    cout<<"Birth time ("<<snake::BIRTH_TIME<<"): ";
+    cin>>snake::BIRTH_TIME;
     cout<<"Defence multiplier ("<<snake::DEFENCE_MULTIPLIER<<"): ";
     cin>>snake::DEFENCE_MULTIPLIER;
     cout<<"Defence adder ("<<snake::DEFENCE_ADDER<<"): ";
@@ -223,9 +223,9 @@ void loadData(string filename="", bool first=1)
         file>>FOOD_PROBABILITY;
         file>>MAX_FOOD_PART;
         file>>SNAKE_PROBABILITY;
-        file>>snake::ENERGY_LOSS_SPEED;
-        file>>snake::DECOMPOSITION_SPEED;
-        file>>snake::BIRTH_SPEED;
+        file>>snake::MAX_ENERGY;
+        file>>snake::DECOMPOSITION_TIME;
+        file>>snake::BIRTH_TIME;
         file>>snake::DEFENCE_MULTIPLIER;
         file>>snake::DEFENCE_ADDER;
         file>>snake::MIN_SPLIT_LENGTH;
@@ -264,7 +264,10 @@ void loadData(string filename="", bool first=1)
     }
     for (int i=start;i<snakes[cv].size();++i)
     {
-        file>>snakes[cv][i].attack>>snakes[cv][i].defence>>snakes[cv][i].colour_r>>snakes[cv][i].colour_g>>snakes[cv][i].colour_b>>snakes[cv][i].dead>>snakes[cv][i].to_next_loss;
+        file>>snakes[cv][i].name>>snakes[cv][i].time_alive>>snakes[cv][i].attack>>snakes[cv][i].colour_r>>snakes[cv][i].colour_g>>snakes[cv][i].colour_b>>snakes[cv][i].direction>>snakes[cv][i].dead>>snakes[cv][i].energy;
+        snakes[cv][i].defence=(1-snakes[cv][i].attack)*snake::DEFENCE_MULTIPLIER+snake::DEFENCE_ADDER;
+        snakes[cv][i].speed_boost=0;
+        snakes[cv][i].defence_boost=0;
         file>>s;
         snakes[cv][i].blocks.resize(s);
         for (int j=0;j<snakes[cv][i].blocks.size();++j)
@@ -281,7 +284,7 @@ void loadData(string filename="", bool first=1)
             file>>in;
         }
         if (type=="random") snakes[cv][i].ctr=new ctrRandom();
-        if (type=="random") snakes[cv][i].ctr=new ctrRandomEvolving();
+        else if (type=="randomEvolving") snakes[cv][i].ctr=new ctrRandomEvolving();
         else if (type=="basic") snakes[cv][i].ctr=new ctrBasic();
         else if (type=="neuralNetwork") snakes[cv][i].ctr=new ctrNeuralNetwork();
         else snakes[cv][i].ctr=new ctrRandom();
@@ -325,6 +328,8 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     benchmark_start_time=start_time;
     while (!glfwWindowShouldClose(sim) && !glfwWindowShouldClose(net))
     {
+        //cerr<<"Start"<<endl;
+
         ++benchmark_counter;
         if (benchmark_counter==1000)
         {
@@ -333,27 +338,45 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             benchmark_start_time=curr_time;
             benchmark_counter=0;
         }
+
+        //cerr<<"Benchmarking done"<<endl;
+
         flashing=(flashing+1)%10;
         if (curr_net>=snakes[cv].size()) curr_net=-1;
+
+        //cerr<<"Flashing and curr_net done"<<endl;
+
         if (new_neural_network || curr_net==-1 || snakes[cv][curr_net].dead || snakes[cv][curr_net].ctr->getType()!="neuralNetwork")
         {
             int start_net=curr_net;
             ++curr_net;
+
+            //cerr<<"Looking for new curr_net "<<start_net<<" "<<snakes[cv].size()<<endl;
+
             bool success=0;
             for (;curr_net<snakes[cv].size();++curr_net)
             {
+                //cerr<<"curr: "<<curr_net<<endl;
+                //cerr<<" "<<snakes[cv][curr_net].blocks.size()<<endl;
+                //cerr<<" "<<snakes[cv][curr_net].dead<<endl;
+                //cerr<<" "<<snakes[cv][curr_net].ctr<<endl;
+                if (!snakes[cv][curr_net].dead) //cerr<<" "<<snakes[cv][curr_net].ctr->getType()<<endl;
                 if (!snakes[cv][curr_net].dead && snakes[cv][curr_net].ctr->getType()=="neuralNetwork")
                 {
+                    //cerr<<"succ"<<endl;
                     success=1;
                     break;
                 }
             }
             if (!success)
             {
+                //cerr<<"here"<<endl;
                 for (curr_net=0;curr_net<=start_net;++curr_net)
                 {
+                    //cerr<<"2curr: "<<curr_net<<endl;
                     if (!snakes[cv][curr_net].dead && snakes[cv][curr_net].ctr->getType()=="neuralNetwork")
                     {
+                        //cerr<<"succ"<<endl;
                         success=1;
                         break;
                     }
@@ -361,14 +384,28 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             }
             if (!success)
             {
+                //cerr<<"No"<<endl;
                 curr_net=-1;
             }
+            /*else
+            {
+                cout<<"Selected snake: "<<snakes[cv][curr_net].name<<endl;
+            }*/
             new_neural_network=0;
         }
+
+        //cerr<<"OK done"<<endl;
+
         if (curr_net!=-1) values=snakes[cv][curr_net].ctr->getValues();
         else values={};
+
+        //cerr<<"To draw"<<endl;
+
         if (draw_neural_net && curr_net!=-1) drawNetWindow(net,values,draw_neural_net_mode);
         if (draw_sim) drawWindow(sim,snakes[cv],foods[cv],flashing<5 && draw_neural_net?curr_net:-1);
+
+        //cerr<<"Drawn"<<endl;
+
         start_time=high_resolution_clock::now();
         do
         {
@@ -376,6 +413,10 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             curr_time=high_resolution_clock::now();
         }
         while(!glfwWindowShouldClose(sim) && !glfwWindowShouldClose(net) && duration_cast<duration<double>>(curr_time-start_time).count()<speed);
+
+
+        //cerr<<"Proceeding"<<endl;
+
         if (change_settings)
         {
             cout<<"Seconds per step/frame: ";
@@ -413,6 +454,9 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             load_data=0;
             reset=0;
         }
+
+        //cerr<<"Checked"<<endl;
+
         if (paused) continue;
         start_time=high_resolution_clock::now();
         generateField(field,snakes[cv],foods[cv]);
@@ -448,6 +492,9 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                 }
             }
         }
+
+        //cerr<<"Done with field"<<endl;
+
         player=-1;
         if (control)
         {
@@ -468,17 +515,27 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             }
             presses.pop();
         }
+
+        //cerr<<"Done with player"<<endl;
+
         for (int i=0;i<snakes[cv].size();++i)
         {
+            //cerr<<"Snake "<<i<<endl;
+
             if (snakes[cv][i].blocks.empty())
             {
                 removed_snakes.push_back(i);
                 continue;
             }
             if (snakes[cv][i].dead) continue;
+
+            //cerr<<"Cont."<<endl;
+
             seeAll(field,snakes[cv][i]);
             if (i!=player)
             {
+                //cerr<<"Isn't player"<<endl;
+
                 res=snakes[cv][i].think();
                 if (!res.second.empty())
                 {
@@ -502,6 +559,8 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                     }
                 }
             }
+            //cerr<<"To Move"<<endl;
+            move_snake:
             p=snakes[cv][i].blocks[0];
             p+=snakes[cv][i].direction;
             x=p.x;
@@ -677,6 +736,11 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                     }
                 }
             }
+            if (snakes[cv][i].speed_boost==1)
+            {
+                snakes[cv][i].speed_boost=0;
+                goto move_snake;
+            }
         }
         int snakes_alive=0;
         int mass_alive=0;
@@ -730,5 +794,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         removed_foods.resize(0);
         cv=!cv;
         //cout<<snakes_alive<<' '<<mass_alive<<' '<<double(mass_alive)/snakes_alive<<' '<<mass_dead<<' '<<foods[cv].size()<<' '<<mass_dead+foods[cv].size()<<'\n';
+
+        //cerr<<"End"<<endl;
     }
 }

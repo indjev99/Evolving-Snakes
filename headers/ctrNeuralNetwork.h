@@ -4,6 +4,9 @@
 #include "controller.h"
 #include<vector>
 
+extern const int inputs;
+extern const int outputs;
+
 struct ctrNeuralNetwork:controller
 {
     double body_length_curve;

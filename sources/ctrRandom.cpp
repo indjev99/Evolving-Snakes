@@ -23,6 +23,8 @@ decision ctrRandom::think()
     decision decision;
     decision.turn_right=!(rand()%8);
     decision.turn_left=!(rand()%8);
+    decision.boost_speed=!(rand()%8);
+    decision.boost_defence=!(rand()%8);
     if (body_length>0)
     {
         decision.split=!(rand()%150);

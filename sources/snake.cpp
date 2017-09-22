@@ -1,20 +1,24 @@
 #include "../headers/snake.h"
 #include "../headers/field_radius.h"
 #include "../headers/randomisation.h"
+#include "../headers/names.h"
 #include<stdlib.h>
 
-int snake::ENERGY_LOSS_SPEED=50;
-int snake::DECOMPOSITION_SPEED=10;
-int snake::BIRTH_SPEED=20;
+int snake::MAX_ENERGY=50;
+int snake::DECOMPOSITION_TIME=10;
+int snake::BIRTH_TIME=20;
 
 double snake::DEFENCE_MULTIPLIER=1;
 double snake::DEFENCE_ADDER=0;
+double snake::DEFENCE_BOOST=1;
 
 int snake::MIN_SPLIT_LENGTH=10;
 int snake::MIN_LENGTH=4;
 
 void snake::randomise(int food, controller* new_ctr)
 {
+    name=createNewName();
+    time_alive=0;
     dead=0;
     blocks.resize(1);
     blocks[0].randomise();
@@ -27,7 +31,9 @@ void snake::randomise(int food, controller* new_ctr)
     randomiseVariable(colour_b,0,1);
     ctr=new_ctr;
     ctr->randomise();
-    to_next_loss=ENERGY_LOSS_SPEED;
+    energy=MAX_ENERGY;
+    speed_boost=0;
+    defence_boost=0;
 }
 bool snake::moveForward()
 {
@@ -36,8 +42,8 @@ bool snake::moveForward()
         if (dead<-1)
         {
             ++dead;
-            defence-=defence/DECOMPOSITION_SPEED;
-            colour_g+=(1-colour_g)/DECOMPOSITION_SPEED;
+            defence-=defence/(-dead);
+            colour_g+=(1-colour_g)/(-dead);
             return 0;
         }
         else if (dead>0)
@@ -54,11 +60,11 @@ bool snake::moveForward()
     }
     blocks[0].food=0;
     blocks[0]+=direction;
-    --to_next_loss;
-    if (to_next_loss==0)
+    --energy;
+    while (energy<=0)
     {
         --blocks[0].food;
-        to_next_loss=ENERGY_LOSS_SPEED;
+        energy+=MAX_ENERGY;
     }
     if (new_pos.food>0)
     {
@@ -88,11 +94,11 @@ std::pair<int, std::vector<block> > snake::think()
     if (dead) return make_pair(dir,new_snake);
 
     ctr->body_length=blocks.size();
-    ctr->energy=0;
+    ctr->food_in_body=0;
 
     for (int i=0;i<blocks.size();++i)
     {
-        ctr->energy+=blocks[i].food;
+        ctr->food_in_body+=blocks[i].food;
     }
 
     decision decision=ctr->think();
@@ -102,7 +108,25 @@ std::pair<int, std::vector<block> > snake::think()
     direction+=4;
     direction%=4;
 
+    speed_boost=decision.boost_speed;
+
+    /*if (defence_boost)
+    {
+        defence_boost=0;
+        defence-=DEFENCE_BOOST;
+    }
+    if (decision.boost_defence)
+    {
+        --energy;
+        defence_boost=1;
+        defence+=DEFENCE_BOOST;
+    }*/
+
     int x1,y1,x2,y2;
+    if (decision.split)
+    {
+        //--energy;
+    }
     if (decision.split && blocks.size()>=MIN_SPLIT_LENGTH && decision.split_length>=MIN_LENGTH && blocks.size()-decision.split_length>=MIN_LENGTH)
     {
         x1=blocks[blocks.size()-1].x;
@@ -202,19 +226,23 @@ void snake::bite(double enemy_defence)
 }
 void snake::die(bool part)
 {
-    dead=-DECOMPOSITION_SPEED;
+    dead=-DECOMPOSITION_TIME;
     if (!part) delete ctr;
 }
 void snake::birth()
 {
-    dead=BIRTH_SPEED;
-    to_next_loss=ENERGY_LOSS_SPEED;
+    dead=BIRTH_TIME;
+    energy=MAX_ENERGY;
+    speed_boost=0;
+    defence_boost=0;
+
+    direction=rand()%4;
     ctr=ctr->clone();
     mutate();
 }
 void snake::mutate()
 {
-    direction=rand()%4;
+    name=mutateName(name);
     mutateVariable(attack,0,1);
     defence=(1-attack)*DEFENCE_MULTIPLIER+DEFENCE_ADDER;
     colour_r=attack;

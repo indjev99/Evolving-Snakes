@@ -5,9 +5,6 @@
 #include<string>
 #include<vector>
 
-extern const int inputs;
-extern const int outputs;
-
 struct controller
 {
     static const int VF_RADIUS=1;
@@ -21,7 +18,7 @@ struct controller
     bool VL_food[1+2*VS_RADIUS];
 
     int body_length;
-    int energy;
+    int food_in_body;
 
     virtual std::string getType() =0;
     virtual std::vector<double> getValues() =0;

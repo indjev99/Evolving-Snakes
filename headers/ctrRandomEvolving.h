@@ -7,6 +7,7 @@
 struct ctrRandomEvolving:controller
 {
     double turn_left_probability,turn_right_probability;
+    double boost_speed_probability,boost_defence_probability;
     double split_probability;
 
     std::string getType();
