@@ -12,8 +12,8 @@ double snake::DEFENCE_MULTIPLIER=1;
 double snake::DEFENCE_ADDER=0;
 double snake::DEFENCE_BOOST=1;
 
-int snake::MIN_SPLIT_LENGTH=10;
-int snake::MIN_LENGTH=4;
+int snake::MIN_SPLIT_LENGTH=2;
+int snake::MIN_LENGTH=1;
 
 void snake::randomise(int food, controller* new_ctr)
 {
@@ -108,9 +108,9 @@ std::pair<int, std::vector<block> > snake::think()
     direction+=4;
     direction%=4;
 
-    speed_boost=decision.boost_speed;
+    //speed_boost=decision.boost_speed;
 
-    /*if (defence_boost)
+    if (defence_boost)
     {
         defence_boost=0;
         defence-=DEFENCE_BOOST;
@@ -120,12 +120,12 @@ std::pair<int, std::vector<block> > snake::think()
         --energy;
         defence_boost=1;
         defence+=DEFENCE_BOOST;
-    }*/
+    }
 
     int x1,y1,x2,y2;
     if (decision.split)
     {
-        //--energy;
+        --energy;
     }
     if (decision.split && blocks.size()>=MIN_SPLIT_LENGTH && decision.split_length>=MIN_LENGTH && blocks.size()-decision.split_length>=MIN_LENGTH)
     {

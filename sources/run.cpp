@@ -221,6 +221,7 @@ void loadData(string filename="", bool first=1)
         file>>s;
         file>>s2;
         file>>s2;
+        file>>s2;
         file>>s;
         file>>s;
         file>>s2;
