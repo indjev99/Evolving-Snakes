@@ -109,7 +109,7 @@ std::pair<int, std::vector<block> > snake::think()
     direction+=4;
     direction%=4;
 
-    //speed_boost=decision.boost_speed;
+    speed_boost=decision.boost_speed;
 
     if (defence_boost)
     {

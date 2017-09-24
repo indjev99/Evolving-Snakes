@@ -319,6 +319,11 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     int flashing=0;
     int benchmark_counter=0;
 
+    bool spe;
+
+    cout<<"Enable speed boost? (0/1): ";
+    cin>>spe;
+
     /*cout<<"Enter attack (0-1): ";
     cin>>attack;
     cout<<"Enter blue (0-1): ";
@@ -698,7 +703,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                     --j;
                 }
             }
-            if (snakes[cv][i].speed_boost==1)
+            if (snakes[cv][i].speed_boost==1 && spe==1)
             {
                 //cerr<<"Boosted"<<"\n";
                 snakes[cv][i].speed_boost=0;
