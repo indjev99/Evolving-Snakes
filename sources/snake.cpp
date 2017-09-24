@@ -164,70 +164,33 @@ std::pair<int, std::vector<block> > snake::think()
     }
     return make_pair(dir,new_snake);
 }
-void snake::eat()
-{
-    if (blocks.empty()) return;
-    ++blocks[0].food;
-}
 void snake::eat(int food)
 {
-    if (!food || blocks.empty()) return;
+    if (blocks.empty()) return;
     blocks[0].food+=food;
 }
 std::pair<int, std::vector<block> > snake::getBit(int node, double enemy_attack)
 {
     int food_given=0;
     std::vector<block> left;
-    if (node!=0 || dead)
+    if (dead>=0 && node==0) die(0);
+    food_given=blocks[node].food+1;
+    for (int i=node+1;i<blocks.size();++i)
     {
-        if (enemy_attack>defence)
-        {
-            food_given=blocks[node].food;
-            for (int i=blocks.size()-1;i>node;--i)
-            {
-                left.push_back(blocks[i]);
-            }
-            blocks.resize(node);
-            if (dead>0 && node==0) die(0);
-        }
+        left.push_back(blocks[i]);
     }
-    else
-    {
-        if (enemy_attack>attack)
-        {
-            die(0);
-            food_given=blocks[node].food;
-            for (int i=blocks.size()-1;i>node;--i)
-            {
-                left.push_back(blocks[i]);
-            }
-            blocks.resize(0);
-        }
-        else if (enemy_attack==attack)
-        {
-            die(0);
-        }
-        else
-        {
-            eat();
-        }
-    }
+    blocks.resize(node);
     return {food_given,left};
-}
-void snake::bite(double enemy_defence)
-{
-    if (enemy_defence>=attack)
-    {
-        die(0);
-    }
-    else
-    {
-        eat();
-    }
 }
 void snake::die(bool part)
 {
-    dead=-DECOMPOSITION_TIME;
+    speed_boost=0;
+    if (defence_boost)
+    {
+        defence-=DEFENCE_BOOST;
+        defence_boost=0;
+    }
+    dead=-DECOMPOSITION_TIME-1;
     if (!part) delete ctr;
 }
 void snake::birth()

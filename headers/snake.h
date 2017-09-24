@@ -35,10 +35,8 @@ struct snake
     void randomise(int food, controller* new_ctr);
     bool moveForward();
     std::pair<int, std::vector<block> > think();
-    void eat();
-    void eat(int food);
+    void eat(int food=1);
     std::pair<int, std::vector<block> > getBit(int node, double enemy_attack);
-    void bite(double enemy_defence);
     void die(bool part);
     void birth();
     void mutate();

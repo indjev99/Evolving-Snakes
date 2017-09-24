@@ -68,7 +68,6 @@
 		<Unit filename="headers/window_functions.h" />
 		<Unit filename="headers/window_size.h" />
 		<Unit filename="sources/colours.cpp" />
-		<Unit filename="sources/controller.cpp" />
 		<Unit filename="sources/ctrBasic.cpp" />
 		<Unit filename="sources/ctrNeuralNetwork.cpp" />
 		<Unit filename="sources/ctrRandom.cpp" />

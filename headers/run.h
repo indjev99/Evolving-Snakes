@@ -15,8 +15,8 @@ extern const int SEED;
 
 void generateField(field& field, std::vector<snake>& snakes, std::vector<point>& foods);
 controller* selectRandomController();
-void saveData(std::string filename);
-void loadData(std::string filename, bool first);
+void saveData(std::string filename="");
+void loadData(std::string filename="", bool first=1);
 void resetData();
 void run(GLFWwindow* sim, GLFWwindow* net);
 

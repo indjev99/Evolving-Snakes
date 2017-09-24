@@ -108,7 +108,7 @@ void resetData()
     cout<<"Maximum mutation ("<<MAX_MUTATION<<"): ";
     cin>>MAX_MUTATION;
 }
-void saveData(string filename="")
+void saveData(string filename)
 {
     if (filename=="")
     {
@@ -156,7 +156,7 @@ void saveData(string filename="")
         file<<"end"<<' ';
     }
 }
-void loadData(string filename="", bool first=1)
+void loadData(string filename, bool first)
 {
     bool only_settings=0;
     bool no_settings=0;
@@ -341,9 +341,9 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     benchmark_start_time=start_time;
 
 
-    //string files[2]={"save2","save10"};
-    string files[4]={"save2_food","save2_food_no_times","save10_food","save10_food_no_times"};
-    int bot_counter=-1;
+    string files[]={"save2","save10","save2_food","save10_food","save2_food_no_times","save10_food_no_times",
+    "save2_defence","save10_defence","save2_food_defence","save10_food_defence","save2_food_no_times_defence","save10_food_no_times_defence"};
+    int bot_counter=-2; //-1;
     int bot_goal=100000;
     int current_file=-1;
 
@@ -352,38 +352,38 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         //cerr<<"Start"<<"\n";
 
         curr_time=high_resolution_clock::now();
-        if (bot_counter==-1 || duration_cast<duration<double>>(curr_time-bot_start_time).count()>=300) //bot_counter==bot_goal)
+        if (bot_counter!=-2 && (bot_counter==-1 || duration_cast<duration<double>>(curr_time-bot_start_time).count()>=200)) //bot_counter==bot_goal)
         {
-            if (current_file>=0 && current_file<4)
+            if (current_file>=0 && current_file<12)
             {
-                saveData(files[current_file]+"_defence");
+                saveData(files[current_file]);
                 curr_time=high_resolution_clock::now();
                 cout<<"Done with file "<<files[current_file]<<" after "<<duration_cast<duration<double>>(curr_time-bot_start_time).count()<<" seconds"<<endl;
             }
             ++current_file;
-            //current_file%=2;
-            if (current_file<4)
+            //current_file%=4;
+            if (current_file<12)
             {
-                bot_start_time=high_resolution_clock::now();
                 cout<<"Starting with file "<<files[current_file]<<endl;
+                bot_start_time=high_resolution_clock::now();
                 bot_counter=0;
                 loadData(files[current_file]);
-                snake::DEFENCE_ADDER=1;
-                foods[cv].resize(0);
-                snakes[cv].resize(0);
+                //foods[cv].resize(0);
+                //snakes[cv].resize(0);
             }
             else
             {
+                bot_counter=-2;
                 cout<<"DONE!"<<endl;
             }
         }
-        if (!paused) ++bot_counter;
+        if (!paused && bot_counter!=-2) ++bot_counter;
 
         if (!paused) ++benchmark_counter;
-        if (benchmark_counter==2000)
+        if (benchmark_counter==10000)
         {
             curr_time=high_resolution_clock::now();
-            cout<<"Time for last 2000 steps: "<<duration_cast<duration<double>>(curr_time-benchmark_start_time).count()<<'\n';
+            cout<<"Time for last 10000 steps: "<<duration_cast<duration<double>>(curr_time-benchmark_start_time).count()<<'\n';
             benchmark_start_time=curr_time;
             benchmark_counter=0;
         }
@@ -541,6 +541,8 @@ void run(GLFWwindow* sim, GLFWwindow* net)
 
             if (snakes[cv][i].blocks.empty())
             {
+
+                if (snakes[cv][i].dead>=0) cerr<<"place 1: "<<snakes[cv][i].dead<<endl;
                 removed_snakes.push_back(i);
                 continue;
             }
@@ -579,6 +581,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             //cerr<<"To Move"<<"\n";
             move_snake:
             //cerr<<"Here"<<"\n";
+            //check if the cell the snake want to move into is free
             p=snakes[cv][i].blocks[0];
             p+=snakes[cv][i].direction;
             x=p.x;
@@ -588,7 +591,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                 if (field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].second!=-1)
                 {
                     int curr_snake=field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].first;
-                    if (field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].second!=0 || snakes[cv][curr_snake].dead)
+                    if (field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].second!=0 || snakes[cv][curr_snake].dead) //collision with a sneak's body
                     {
                         if (snakes[cv][i].attack<=snakes[cv][curr_snake].defence)
                         {
@@ -596,9 +599,9 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                             break;
                         }
                     }
-                    else
+                    else if (curr_snake!=i) //collision with another snakes's head
                     {
-                        if (snakes[cv][i].attack==snakes[cv][curr_snake].attack ||
+                        /*if (snakes[cv][i].attack==snakes[cv][curr_snake].attack ||
                         (snakes[cv][i].attack<snakes[cv][curr_snake].attack && (4+snakes[cv][i].direction-2)%4!=snakes[cv][curr_snake].direction && curr_snake>i))
                         {
                             if (snakes[cv][i].attack==snakes[cv][curr_snake].attack && (4+snakes[cv][i].direction-2)%4==snakes[cv][curr_snake].direction)
@@ -607,14 +610,20 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                             }
                             snakes[cv][i].die(0);
                             break;
+                        }*/
+                        if (snakes[cv][i].attack<=snakes[cv][curr_snake].attack)
+                        {
+                            snakes[cv][i].die(0);
+                            break;
                         }
                     }
                 }
             }
             //cerr<<"Done here"<<"\n";
             if (snakes[cv][i].dead) continue;
+            //the snake can move into the cell
             //cerr<<"Here2"<<"\n";
-            for (int j=0;j<snakes[cv][i].blocks.size();++j)
+            for (int j=0;j<snakes[cv][i].blocks.size();++j) //remove the snake from field, to add it again after it moved
             {
                 x=snakes[cv][i].blocks[j].x;
                 y=snakes[cv][i].blocks[j].y;
@@ -630,13 +639,14 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             //cerr<<"To Move Forward"<<"\n";
             snakes[cv][i].moveForward();
             //cerr<<"Moved"<<"\n";
-            if (snakes[cv][i].blocks.empty())
+            if (snakes[cv][i].blocks.empty()) //snake ran out of energy and died
             {
+                if (snakes[cv][i].dead>=0) cerr<<"place 2: "<<snakes[cv][i].dead<<endl;
                 removed_snakes.push_back(i);
                 continue;
             }
             //cerr<<"Still Alive!"<<"\n";
-            for (int j=0;j<snakes[cv][i].blocks.size();++j)
+            for (int j=0;j<snakes[cv][i].blocks.size();++j) //adding the snake in field
             {
                 x=snakes[cv][i].blocks[j].x;
                 y=snakes[cv][i].blocks[j].y;
@@ -648,7 +658,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             y=p.y;
             for (int j=0;j<field[x+FIELD_RADIUS][y+FIELD_RADIUS].size();++j)
             {
-                if (field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].second==-1)
+                if (field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].second==-1) //eat a piece of food
                 {
                     int f=field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].first;
                     removed_foods.push_back(f);
@@ -660,104 +670,32 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                 {
                     int curr_snake=field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].first;
                     int curr_node=field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].second;
-                    if (curr_node!=0 || snakes[cv][curr_snake].dead)
+                    if (curr_snake==i && curr_node==0) continue;
+                    res=snakes[cv][curr_snake].getBit(curr_node,snakes[cv][i].attack);
+                    food_gained=res.first;
+                    if (!res.second.empty()) //there is some leftover body
                     {
-                        res=snakes[cv][curr_snake].getBit(curr_node,snakes[cv][i].attack);
-                        food_gained=res.first;
-                        if (!res.second.empty())
+                        s=snakes[cv][curr_snake];
+                        s.blocks=res.second;
+                        if (s.dead>=0) s.die(1);
+                        snakes[cv].push_back(s);
+                        for (int k=0;k<s.blocks.size();++k)
                         {
-                            s=snakes[cv][curr_snake];
-                            s.blocks=res.second;
-                            if (s.dead>=0) s.die(1);
-                            snakes[cv].push_back(s);
-                            for (int k=0;k<s.blocks.size();++k)
+                            int x2=s.blocks[k].x;
+                            int y2=s.blocks[k].y;
+                            for (int kk=0;kk<field[x2+FIELD_RADIUS][y2+FIELD_RADIUS].size();++kk) //add the leftover body in field
                             {
-                                int x2=s.blocks[k].x;
-                                int y2=s.blocks[k].y;
-                                for (int kk=0;kk<field[x2+FIELD_RADIUS][y2+FIELD_RADIUS].size();++kk)
+                                if (field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].first==curr_snake && field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].second!=-1)
                                 {
-                                    if (field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].first==curr_snake && field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].second!=-1)
-                                    {
-                                        field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].first=snakes[cv].size()-1;
-                                        field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].second=k;
-                                    }
-                                }
-                            }
-                        }
-                        snakes[cv][i].bite(snakes[cv][curr_snake].defence);
-                        snakes[cv][i].eat(food_gained);
-                        if (!snakes[cv][i].dead)
-                        {
-                            field[x+FIELD_RADIUS][y+FIELD_RADIUS].erase(field[x+FIELD_RADIUS][y+FIELD_RADIUS].begin()+j);
-                            --j;
-                        }
-                    }
-                    else if (curr_snake!=i)
-                    {
-                        res=snakes[cv][curr_snake].getBit(curr_node,snakes[cv][i].attack);
-                        food_gained=res.first;
-                        if (!res.second.empty())
-                        {
-                            s=snakes[cv][curr_snake];
-                            s.blocks=res.second;
-                            if (s.dead>=0) s.die(1);
-                            snakes[cv].push_back(s);
-                            for (int k=0;k<s.blocks.size();++k)
-                            {
-                                int x2=s.blocks[k].x;
-                                int y2=s.blocks[k].y;
-                                for (int kk=0;kk<field[x2+FIELD_RADIUS][y2+FIELD_RADIUS].size();++kk)
-                                {
-                                    if (field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].first==curr_snake && field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].second!=-1)
-                                    {
-                                        field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].first=snakes[cv].size()-1;
-                                        field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].second=k;
-                                    }
-                                }
-                            }
-                        }
-                        snakes[cv][i].eat(food_gained);
-                        res=snakes[cv][i].getBit(curr_node,snakes[cv][curr_snake].attack);
-                        food_gained=res.first;
-                        if (!res.second.empty())
-                        {
-                            s=snakes[cv][i];
-                            s.blocks=res.second;
-                            if (s.dead>=0) s.die(1);
-                            snakes[cv].push_back(s);
-                            for (int k=0;k<s.blocks.size();++k)
-                            {
-                                int x2=s.blocks[k].x;
-                                int y2=s.blocks[k].y;
-                                for (int kk=0;kk<field[x2+FIELD_RADIUS][y2+FIELD_RADIUS].size();++kk)
-                                {
-                                    if (field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].first==i && field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].second!=-1)
-                                    {
-                                        field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].first=snakes[cv].size()-1;
-                                        field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].second=k;
-                                    }
-                                }
-                            }
-                        }
-                        snakes[cv][curr_snake].eat(food_gained);
-                        if (!snakes[cv][i].dead)
-                        {
-                            field[x+FIELD_RADIUS][y+FIELD_RADIUS].erase(field[x+FIELD_RADIUS][y+FIELD_RADIUS].begin()+j);
-                            --j;
-                        }
-                        else
-                        {
-                            for (int k=0;k<field[x+FIELD_RADIUS][y+FIELD_RADIUS].size();++k)
-                            {
-                                if (field[x+FIELD_RADIUS][y+FIELD_RADIUS][k].first==i && field[x+FIELD_RADIUS][y+FIELD_RADIUS][k].second!=-1)
-                                {
-                                    field[x+FIELD_RADIUS][y+FIELD_RADIUS].erase(field[x+FIELD_RADIUS][y+FIELD_RADIUS].begin()+j);
-                                    if (k<=j) --j;
-                                    break;
+                                    field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].first=snakes[cv].size()-1;
+                                    field[x2+FIELD_RADIUS][y2+FIELD_RADIUS][kk].second=k;
                                 }
                             }
                         }
                     }
+                    snakes[cv][i].eat(food_gained);
+                    field[x+FIELD_RADIUS][y+FIELD_RADIUS].erase(field[x+FIELD_RADIUS][y+FIELD_RADIUS].begin()+j); //removes the eaten snake part from field
+                    --j;
                 }
             }
             if (snakes[cv][i].speed_boost==1)
@@ -775,7 +713,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         int mass_dead=0;
         for (int i=0;i<snakes[cv].size();++i)
         {
-            if (snakes[cv][i].dead)
+            if (snakes[cv][i].dead && snakes[cv][i].blocks.size()>0)
             {
                 if (snakes[cv][i].moveForward())
                 {
@@ -784,6 +722,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                         curr_food=food(snakes[cv][i].blocks[j].x,snakes[cv][i].blocks[j].y,snakes[cv][i].colour_r,snakes[cv][i].colour_g,snakes[cv][i].colour_b);
                         foods[cv].push_back(curr_food);
                     }
+                    if (snakes[cv][i].dead>=0) cerr<<"place 3: "<<snakes[cv][i].dead<<endl;
                     removed_snakes.push_back(i);
                 }
                 else mass_dead+=snakes[cv][i].blocks.size();
@@ -802,10 +741,14 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             if (rem_ind>=removed_snakes.size() || i<removed_snakes[rem_ind]) snakes[!cv].push_back(snakes[cv][i]);
             else
             {
+                if (i!=removed_snakes[rem_ind])
+                {
+                    cerr<<"WARNING: Removed wrong snake. Sanke: "<<i<<" Rem_ind: "<<rem_ind<<" Snake to remove:"<<removed_snakes[rem_ind]<<endl;
+                }
                 if (snakes[cv][i].dead>=0)
                 {
+                    cerr<<"WARNING: Snake "<<i<<" not killed but removed. "<<snakes[cv][i].dead<<endl;
                     snakes[cv][i].die(0);
-                    ////cerr<<"WARNING: Snake "<<i<<" not killed but removed."<<endl;
                 }
                 ++rem_ind;
             }
