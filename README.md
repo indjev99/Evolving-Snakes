@@ -16,7 +16,7 @@ Controls:
 * f6 - enter new delay between steps in seconds in the console (0 for no delay - max speed)
 * f7 - save the current state, enter the name of the file in the console
 * f8 - load a save, eneter the name of the file in the console
-* f9 - reset, enter 'y' or 'n' in the console to choose whether to chenge the settings, the current settings will be shown in brackets
+* f9 - change settings/reset, enter 'y' or 'n' in the console to choose whether to reset and then whether to chenge the settings, the current settings will be shown in brackets
 * f10 - toggle on/off controlling the selected snake with the arrow keys.
 
 There are more options for the loading:
