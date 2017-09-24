@@ -12,8 +12,8 @@ double snake::DEFENCE_MULTIPLIER=1;
 double snake::DEFENCE_ADDER=0;
 double snake::DEFENCE_BOOST=1;
 
-int snake::MIN_SPLIT_LENGTH=2;
-int snake::MIN_LENGTH=1;
+int snake::MIN_SPLIT_LENGTH=10;
+int snake::MIN_LENGTH=4;
 
 void snake::randomise(int food, controller* new_ctr)
 {
@@ -86,6 +86,7 @@ bool snake::moveForward()
     }
     return 0;
 }
+
 std::pair<int, std::vector<block> > snake::think()
 {
     std::vector<block> new_snake;

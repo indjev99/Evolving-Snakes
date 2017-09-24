@@ -195,9 +195,9 @@ decision ctrNeuralNetwork::decodeOutputs()
     if (neurons[topology.size()-1][curr++]>=action_treshhold) decision.turn_left=1;
     else decision.turn_left=0;
     if (neurons[topology.size()-1][curr++]>=action_treshhold) decision.boost_speed=1;
-    else decision.turn_left=0;
+    else decision.boost_speed=0;
     if (neurons[topology.size()-1][curr++]>=action_treshhold) decision.boost_defence=1;
-    else decision.turn_left=0;
+    else decision.boost_defence=0;
     if (neurons[topology.size()-1][curr++]>=action_treshhold) decision.split=1;
     else decision.split=0;
     decision.split_length=round(body_length*neurons[topology.size()-1][curr++]);

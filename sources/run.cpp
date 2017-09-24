@@ -58,7 +58,7 @@ controller* selectRandomController()
     //return new ctrRandom();
     //return new ctrRandomEvolving();
     //return new ctrBasic();
-    return new ctrNeuralNetwork({1,8,6});
+    return new ctrNeuralNetwork({1,8,7});
     //return new ctrNeuralNetwork({5,20,20,20,20});
 }
 vector<snake> snakes[2];
@@ -77,7 +77,7 @@ void resetData()
     cin>>answer;
     if (answer=='y' || answer=='Y')
     {
-       foods[cv].resize(0);
+        foods[cv].resize(0);
         snakes[cv].resize(0);
     }
     cout<<"Change settings? (Y/N): ";
@@ -99,6 +99,8 @@ void resetData()
     cin>>snake::DEFENCE_MULTIPLIER;
     cout<<"Defence adder ("<<snake::DEFENCE_ADDER<<"): ";
     cin>>snake::DEFENCE_ADDER;
+    cout<<"Defence boost ("<<snake::DEFENCE_BOOST<<"): ";
+    cin>>snake::DEFENCE_BOOST;
     cout<<"Minimum length to split ("<<snake::MIN_SPLIT_LENGTH<<"): ";
     cin>>snake::MIN_SPLIT_LENGTH;
     cout<<"Minimum length of split part ("<<snake::MIN_LENGTH<<"): ";
@@ -106,11 +108,13 @@ void resetData()
     cout<<"Maximum mutation ("<<MAX_MUTATION<<"): ";
     cin>>MAX_MUTATION;
 }
-void saveData()
+void saveData(string filename="")
 {
-    string filename;
-    cout<<"Save to file: ";
-    cin>>filename;
+    if (filename=="")
+    {
+        cout<<"Save to file: ";
+        cin>>filename;
+    }
     ofstream file(filename.c_str());
     file<<FIELD_RADIUS<<' ';
     file<<controller::VF_RADIUS<<' ';
@@ -332,18 +336,54 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         s.randomise(3,selectRandomController());
         snakes[cv].push_back(s);
     }
-    high_resolution_clock::time_point start_time,curr_time,benchmark_start_time;
+    high_resolution_clock::time_point start_time,curr_time,benchmark_start_time,bot_start_time;
     start_time=high_resolution_clock::now();
     benchmark_start_time=start_time;
+
+
+    //string files[2]={"save2","save10"};
+    string files[4]={"save2_food","save2_food_no_times","save10_food","save10_food_no_times"};
+    int bot_counter=-1;
+    int bot_goal=100000;
+    int current_file=-1;
+
     while (!glfwWindowShouldClose(sim) && !glfwWindowShouldClose(net))
     {
         //cerr<<"Start"<<"\n";
 
+        curr_time=high_resolution_clock::now();
+        if (bot_counter==-1 || duration_cast<duration<double>>(curr_time-bot_start_time).count()>=300) //bot_counter==bot_goal)
+        {
+            if (current_file>=0 && current_file<4)
+            {
+                saveData(files[current_file]+"_defence");
+                curr_time=high_resolution_clock::now();
+                cout<<"Done with file "<<files[current_file]<<" after "<<duration_cast<duration<double>>(curr_time-bot_start_time).count()<<" seconds"<<endl;
+            }
+            ++current_file;
+            //current_file%=2;
+            if (current_file<4)
+            {
+                bot_start_time=high_resolution_clock::now();
+                cout<<"Starting with file "<<files[current_file]<<endl;
+                bot_counter=0;
+                loadData(files[current_file]);
+                snake::DEFENCE_ADDER=1;
+                foods[cv].resize(0);
+                snakes[cv].resize(0);
+            }
+            else
+            {
+                cout<<"DONE!"<<endl;
+            }
+        }
+        if (!paused) ++bot_counter;
+
         if (!paused) ++benchmark_counter;
-        if (benchmark_counter==1000)
+        if (benchmark_counter==2000)
         {
             curr_time=high_resolution_clock::now();
-            cout<<"Time for last 1000 steps: "<<duration_cast<duration<double>>(curr_time-benchmark_start_time).count()<<'\n';
+            cout<<"Time for last 2000 steps: "<<duration_cast<duration<double>>(curr_time-benchmark_start_time).count()<<'\n';
             benchmark_start_time=curr_time;
             benchmark_counter=0;
         }
@@ -380,9 +420,10 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             {
                 curr_net=-1;
             }
-            else
+            /*else
             {
-            }
+                cout<<"Selected snake: "<<snakes[cv][curr_net].name<<endl;
+            }*/
             new_neural_network=0;
         }
         if (curr_net!=-1) values=snakes[cv][curr_net].ctr->getValues();

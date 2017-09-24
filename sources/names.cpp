@@ -24,7 +24,7 @@ std::string mutateName(std::string input)
 {
     std::string output;
     int affix;
-    if (rand()%10==0)
+    /*if (rand()%10==0)
     {
         affix=rand()%13;
         if (affix==0) //english
@@ -89,7 +89,7 @@ std::string mutateName(std::string input)
             else output=input+"eanu";
         }
     }
-    else
+    else*/
     {
         output=input;
         if (output.size()>=3)
