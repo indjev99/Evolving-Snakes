@@ -27,6 +27,16 @@ double SNAKE_PROBABILITY=0.000002;
 
 const int SEED=1;
 
+const vector<string> files={"save2","save2_new","save2_defence","save2_mult5","save2_nofood_300","save2_nofood_500","save2_nofood_300_defence","save2_nofood_500_defence",
+                            "save2_food","save2_food_notimes","save2_food_defence","save2_food_notimes_defence",
+                            "save10","save10_new","save10_defence","save10_nofood_300","save10_nofood_500","save10_nofood_500_changed","save10_nofood_300_defence","save10_nofood_500_defence",
+                            "save10_food","save10_food_notimes","save10_food_defence","save10_food_notimes_defence"};
+
+//const vector<string> files={"save2_nofood_300","save2_nofood_500","save2_nofood_300_defence","save2_nofood_500_defence","save10_nofood_300_defence","save10_nofood_500_defence","save2_mult5","save10_mult5"};
+//const vector<string> files={"save2_food","save2_food_notimes","save2_food_defence","save2_food_notimes_defence","save10_food","save10_food_notimes","save10_food_defence","save10_food_notimes_defence"};
+bool bot_enabled=0;
+int current_file=-1;
+
 void generateField(field& field, vector<snake>& snakes, vector<food>& foods)
 {
     pair<int, int> curr;
@@ -156,7 +166,7 @@ void saveData(string filename)
         file<<"end"<<' ';
     }
 }
-void loadData(string filename, bool first)
+void loadData(string filename, bool first, bool lowest_level)
 {
     bool only_settings=0;
     bool no_settings=0;
@@ -197,7 +207,7 @@ void loadData(string filename, bool first)
     {
         if (filename[i]=='+')
         {
-            if (i<filename.size()-1) loadData(filename.substr(i+1),first);
+            if (i<filename.size()-1) loadData(filename.substr(i+1),first,0);
             first=0;
             filename=filename.substr(0,i);
             break;
@@ -278,9 +288,6 @@ void loadData(string filename, bool first)
     for (int i=start;i<snakes[cv].size();++i)
     {
         file>>snakes[cv][i].name>>snakes[cv][i].time_alive>>snakes[cv][i].attack>>snakes[cv][i].defence_boost>>snakes[cv][i].colour_r>>snakes[cv][i].colour_g>>snakes[cv][i].colour_b>>snakes[cv][i].direction>>snakes[cv][i].dead>>snakes[cv][i].energy;
-        snakes[cv][i].defence=(1-snakes[cv][i].attack)*snake::DEFENCE_MULTIPLIER+snake::DEFENCE_ADDER;
-        if (snakes[cv][i].defence_boost) snakes[cv][i].defence+=snake::DEFENCE_BOOST;
-        snakes[cv][i].speed_boost=0;
         file>>s;
         snakes[cv][i].blocks.resize(s);
         for (int j=0;j<snakes[cv][i].blocks.size();++j)
@@ -303,6 +310,12 @@ void loadData(string filename, bool first)
         else snakes[cv][i].ctr=new ctrRandom();
         snakes[cv][i].ctr->setValues(values);
     }
+    for (int i=0;i<snakes[cv].size();++i)
+    {
+        snakes[cv][i].defence=(1-snakes[cv][i].attack)*snake::DEFENCE_MULTIPLIER+snake::DEFENCE_ADDER;
+        if (snakes[cv][i].defence_boost) snakes[cv][i].defence+=snake::DEFENCE_BOOST;
+        snakes[cv][i].speed_boost=0;
+    }
 }
 void run(GLFWwindow* sim, GLFWwindow* net)
 {
@@ -319,10 +332,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     int flashing=0;
     int benchmark_counter=0;
 
-    bool spe;
-
-    cout<<"Enable speed boost? (0/1): ";
-    cin>>spe;
+    bool spe=1;
 
     /*cout<<"Enter attack (0-1): ";
     cin>>attack;
@@ -345,44 +355,35 @@ void run(GLFWwindow* sim, GLFWwindow* net)
     start_time=high_resolution_clock::now();
     benchmark_start_time=start_time;
 
-
-    string files[]={"save2","save10","save2_food","save10_food","save2_food_no_times","save10_food_no_times",
-    "save2_defence","save10_defence","save2_food_defence","save10_food_defence","save2_food_no_times_defence","save10_food_no_times_defence"};
-    int bot_counter=-2; //-1;
-    int bot_goal=100000;
-    int current_file=-1;
-
     while (!glfwWindowShouldClose(sim) && !glfwWindowShouldClose(net))
     {
         //cerr<<"Start"<<"\n";
 
         curr_time=high_resolution_clock::now();
-        if (bot_counter!=-2 && (bot_counter==-1 || duration_cast<duration<double>>(curr_time-bot_start_time).count()>=200)) //bot_counter==bot_goal)
+        if (bot_enabled && duration_cast<duration<double>>(curr_time-bot_start_time).count()>=300)
         {
-            if (current_file>=0 && current_file<12)
+            if (current_file>=0 && current_file<files.size())
             {
                 saveData(files[current_file]);
                 curr_time=high_resolution_clock::now();
                 cout<<"Done with file "<<files[current_file]<<" after "<<duration_cast<duration<double>>(curr_time-bot_start_time).count()<<" seconds"<<endl;
             }
             ++current_file;
-            //current_file%=4;
-            if (current_file<12)
+            current_file%=files.size();
+            if (current_file<files.size())
             {
                 cout<<"Starting with file "<<files[current_file]<<endl;
                 bot_start_time=high_resolution_clock::now();
-                bot_counter=0;
                 loadData(files[current_file]);
                 //foods[cv].resize(0);
                 //snakes[cv].resize(0);
             }
             else
             {
-                bot_counter=-2;
+                bot_enabled=0;
                 cout<<"DONE!"<<endl;
             }
         }
-        if (!paused && bot_counter!=-2) ++bot_counter;
 
         if (!paused) ++benchmark_counter;
         if (benchmark_counter==10000)
