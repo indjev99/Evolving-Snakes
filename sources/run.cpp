@@ -609,16 +609,6 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                     }
                     else if (curr_snake!=i) //collision with another snakes's head
                     {
-                        /*if (snakes[cv][i].attack==snakes[cv][curr_snake].attack ||
-                        (snakes[cv][i].attack<snakes[cv][curr_snake].attack && (4+snakes[cv][i].direction-2)%4!=snakes[cv][curr_snake].direction && curr_snake>i))
-                        {
-                            if (snakes[cv][i].attack==snakes[cv][curr_snake].attack && (4+snakes[cv][i].direction-2)%4==snakes[cv][curr_snake].direction)
-                            {
-                                snakes[cv][curr_snake].die(0);
-                            }
-                            snakes[cv][i].die(0);
-                            break;
-                        }*/
                         if (snakes[cv][i].attack<=snakes[cv][curr_snake].attack)
                         {
                             snakes[cv][i].die(0);
