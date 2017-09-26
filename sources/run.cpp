@@ -27,9 +27,9 @@ double SNAKE_PROBABILITY=0.000002;
 
 const int SEED=1;
 
-const vector<string> files={"save2","save2_new","save2_defence","save2_mult5","save2_nofood_300","save2_nofood_500","save2_nofood_300_defence","save2_nofood_500_defence",
+const vector<string> files={"save2","save2_new","save2_defence","save2_mult5","save2_nofood_300","save2_nofood_500","save2_nofood_300_defence","save2_nofood_500_defence","save2_eggs"
                             "save2_food","save2_food_notimes","save2_food_defence","save2_food_notimes_defence",
-                            "save10","save10_new","save10_defence","save10_nofood_300","save10_nofood_500","save10_nofood_500_changed","save10_nofood_300_defence","save10_nofood_500_defence",
+                            "save10","save10_new","save10_defence","save10_nofood_300","save10_nofood_500","save10_nofood_500_changed","save10_nofood_300_defence","save10_nofood_500_defence","save10_eggs",
                             "save10_food","save10_food_notimes","save10_food_defence","save10_food_notimes_defence"};
 
 //const vector<string> files={"save2_nofood_300","save2_nofood_500","save2_nofood_300_defence","save2_nofood_500_defence","save10_nofood_300_defence","save10_nofood_500_defence","save2_mult5","save10_mult5"};
@@ -435,8 +435,10 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         if (curr_net!=-1) values=snakes[cv][curr_net].ctr->getValues();
         else values={};
 
-        if (draw_neural_net && curr_net!=-1) drawNetWindow(net,values,draw_neural_net_mode);
-        if (draw_sim) drawWindow(sim,snakes[cv],foods[cv],flashing<5 && draw_neural_net?curr_net:-1);
+        if (draw_neural_net && curr_net!=-1) drawNetWindow(net,values,draw_neural_net_mode,draw_neural_net_neuron,draw_neural_net_neuron_increment);
+        if (draw_sim) drawWindow(sim,snakes[cv],foods[cv],draw_sim_mode,flashing<5 && draw_neural_net?curr_net:-1);
+
+        draw_neural_net_neuron_increment=0;
 
         start_time=high_resolution_clock::now();
         do
@@ -448,7 +450,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
 
         if (change_settings)
         {
-            cout<<"Seconds per step/frame: ";
+            cout<<"Seconds per step: ";
             cin>>speed;
             glfwPollEvents();
             change_settings=0;
@@ -556,11 +558,11 @@ void run(GLFWwindow* sim, GLFWwindow* net)
 
             //cerr<<"Cont."<<"\n";
 
-            seeAll(field,snakes[cv][i]);
             if (i!=player)
             {
                 //cerr<<"Isn't player"<<"\n";
 
+                seeAll(field,snakes[cv][i]);
                 res=snakes[cv][i].think();
                 if (!res.second.empty())
                 {
@@ -744,7 +746,11 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         int rem_ind=0;
         for (int i=0;i<snakes[cv].size();++i)
         {
-            if (rem_ind>=removed_snakes.size() || i<removed_snakes[rem_ind]) snakes[!cv].push_back(snakes[cv][i]);
+            if (rem_ind>=removed_snakes.size() || i<removed_snakes[rem_ind])
+            {
+                if (curr_net==i) curr_net=snakes[!cv].size();
+                snakes[!cv].push_back(snakes[cv][i]);
+            }
             else
             {
                 if (i!=removed_snakes[rem_ind])

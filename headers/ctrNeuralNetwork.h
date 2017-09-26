@@ -18,6 +18,7 @@ struct ctrNeuralNetwork:controller
     std::vector<std::vector<std::vector<double> > > weights;
     std::vector<std::vector<double> > neurons;
     std::vector<std::vector<double> > importance;
+    std::vector<std::vector<double> > effect;
 
     ctrNeuralNetwork();
     ctrNeuralNetwork(std::vector<int> new_topology);
@@ -27,7 +28,7 @@ struct ctrNeuralNetwork:controller
     ctrNeuralNetwork* clone();
     void randomise();
     void mutate();
-    void calcImportance(int mode);
+    void calcImportance(int mode, int neuron);
     void calcImportancePartial(int mode);
     decision think();
     void loadInputs();

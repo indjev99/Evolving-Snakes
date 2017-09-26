@@ -11,5 +11,5 @@ void drawGridSquare(int x, int y, double colour_r, double colour_g, double colou
 void drawGrid(double colour_r, double colour_g, double colour_b, double thickness);
 void drawSnake(snake& s, bool selected);
 void drawFood(food& f);
-void drawWindow(GLFWwindow* w, std::vector<snake>& snakes, std::vector<food>& foods, int selected);
+void drawWindow(GLFWwindow* w, std::vector<snake>& snakes, std::vector<food>& foods, int mode, int selected);
 #endif // DRAW_H_INCLUDED

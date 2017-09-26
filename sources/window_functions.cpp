@@ -11,8 +11,11 @@ bool paused=0;
 bool new_neural_network=0;
 bool change_settings=0;
 bool draw_sim=1;
+int draw_sim_mode=0;
 bool draw_neural_net=1;
 int draw_neural_net_mode=0;
+int draw_neural_net_neuron=-1;
+bool draw_neural_net_neuron_increment=0;
 bool save_data=0;
 bool load_data=0;
 bool reset=0;
@@ -55,29 +58,39 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
     }
     if ((key==GLFW_KEY_F4) && action==GLFW_PRESS)
     {
-        draw_neural_net=!draw_neural_net;
+        draw_sim_mode=(draw_sim_mode+1)%4;
     }
     if ((key==GLFW_KEY_F5) && action==GLFW_PRESS)
     {
-        draw_neural_net_mode=(draw_neural_net_mode+1)%4;
+        draw_neural_net=!draw_neural_net;
     }
+
     if ((key==GLFW_KEY_F6) && action==GLFW_PRESS)
     {
-        change_settings=1;
+        draw_neural_net_mode=(draw_neural_net_mode+1)%4;
     }
     if ((key==GLFW_KEY_F7) && action==GLFW_PRESS)
     {
-        save_data=1;
+        ++draw_neural_net_neuron;
+        draw_neural_net_neuron_increment=1;
     }
     if ((key==GLFW_KEY_F8) && action==GLFW_PRESS)
     {
-        load_data=1;
+        change_settings=1;
     }
     if ((key==GLFW_KEY_F9) && action==GLFW_PRESS)
     {
-        reset=1;
+        save_data=1;
     }
     if ((key==GLFW_KEY_F10) && action==GLFW_PRESS)
+    {
+        load_data=1;
+    }
+    if ((key==GLFW_KEY_F11) && action==GLFW_PRESS)
+    {
+        reset=1;
+    }
+    if ((key==GLFW_KEY_F12) && action==GLFW_PRESS)
     {
         control=!control;
     }

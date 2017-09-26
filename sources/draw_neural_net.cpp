@@ -4,12 +4,16 @@
 #include "../headers/window_size.h"
 #include "../headers/ctrNeuralNetwork.h"
 
-void drawNet(GLFWwindow* w, std::vector<double>& values, int mode)
+void drawNet(GLFWwindow* w, std::vector<double>& values, int mode, int& neuron, bool neuron_increment)
 {
     if (values.empty()) return;
     ctrNeuralNetwork nn;
     nn.setValues(values);
-    if (mode>=2) nn.calcImportance(mode-2);
+    if (neuron>=nn.topology[nn.topology.size()-1] && neuron_increment)
+    {
+        neuron=-1;
+    }
+    if (mode>=2) nn.calcImportance(mode-2,neuron);
     double dx,dy,dy2,x,y,y2;
     double weight;
     double over;
@@ -58,7 +62,7 @@ void drawNet(GLFWwindow* w, std::vector<double>& values, int mode)
 
     glEnd();
 
-    glDisable(GL_BLEND);
+    glBegin(GL_TRIANGLES);
 
     dx=one*2.0/nn.topology.size();
     x=-one-dx/2;
@@ -72,15 +76,29 @@ void drawNet(GLFWwindow* w, std::vector<double>& values, int mode)
             y-=dy;
             radius=dy/4;
             if (dx/4<radius) radius=dx/4;
-            glColor3f(NN_OUTLINE_COLOUR_R,NN_OUTLINE_COLOUR_G,NN_OUTLINE_COLOUR_B);
+            glColor4f(NN_OUTLINE_COLOUR_R,NN_OUTLINE_COLOUR_G,NN_OUTLINE_COLOUR_B,1);
             drawPartEllipse(x,y,radius*1.075,radius*1.075,0,360);
-            if (mode>=2) glColor3f(nn.importance[i][j],nn.importance[i][j],nn.importance[i][j]);
-            else glColor3f(nn.neurons[i][j],nn.neurons[i][j],nn.neurons[i][j]);
+            if (mode>=2) glColor4f(nn.importance[i][j],nn.importance[i][j],nn.importance[i][j],1);
+            else
+            {
+                if (nn.neurons[i][j]>=0) glColor4f(nn.neurons[i][j],nn.neurons[i][j],nn.neurons[i][j],1);
+                else glColor4f(-nn.neurons[i][j]/2,-nn.neurons[i][j]/2,-nn.neurons[i][j],1);
+            }
             drawPartEllipse(x,y,radius,radius,0,360);
+            if (neuron!=-1)
+            {
+                if (nn.effect[i][j]>=0) glColor4f(1,0,0,nn.effect[i][j]);
+                else glColor4f(0,0,1,-nn.effect[i][j]);
+                drawPartEllipse(x,y,radius/2,radius/2,0,360);
+            }
         }
     }
+
+    glEnd();
+
+    glDisable(GL_BLEND);
 }
-void drawNetWindow(GLFWwindow* w, std::vector<double>& values, int mode)
+void drawNetWindow(GLFWwindow* w, std::vector<double>& values, int mode, int& neuron, bool neuron_increment)
 {
     glfwSetWindowShouldClose(w,0);
 
@@ -109,7 +127,7 @@ void drawNetWindow(GLFWwindow* w, std::vector<double>& values, int mode)
 
     glEnd();
 
-    drawNet(w,values,mode);
+    drawNet(w,values,mode,neuron,neuron_increment);
 
     glfwSwapBuffers(w);
 }

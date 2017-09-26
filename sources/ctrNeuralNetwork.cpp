@@ -26,11 +26,12 @@ ctrNeuralNetwork::ctrNeuralNetwork(std::vector<int> new_topology)
     topology.push_back(outputs+memory_neurons);
     neurons.resize(topology.size());
     importance.resize(topology.size());
+    effect.resize(topology.size());
     weights.resize(topology.size());
     for (int i=0; i<topology.size(); ++i)
     {
         neurons[i].resize(topology[i]);
-        importance[i].resize(topology[i]);
+        effect[i].resize(topology[i]);
         weights[i].resize(topology[i]);
         if (i)
         {
@@ -82,6 +83,7 @@ void ctrNeuralNetwork::setValues(std::vector<double>& values)
     topology.resize(round(values[curr++]));
     neurons.resize(topology.size());
     importance.resize(topology.size());
+    effect.resize(topology.size());
     weights.resize(topology.size());
 
     for (int i=0; i<topology.size(); ++i)
@@ -89,6 +91,7 @@ void ctrNeuralNetwork::setValues(std::vector<double>& values)
         topology[i]=round(values[curr++]);
         neurons[i].resize(topology[i]);
         importance[i].resize(topology[i]);
+        effect[i].resize(topology[i]);
         weights[i].resize(topology[i]);
         for (int j=0; j<topology[i]; ++j)
         {
@@ -141,40 +144,75 @@ void ctrNeuralNetwork::mutate()
         }
     }
 }
-void ctrNeuralNetwork::calcImportance(int mode)
+void ctrNeuralNetwork::calcImportance(int mode, int neuron)
 {
-    for (int i=0; i<topology[topology.size()-1]; ++i)
+    if (neuron==-1)
     {
-        importance[topology.size()-1][i]=1;
-    }
-    for (int i=0; i<IMPORTANCE_ITERATIONS; ++i)
-    {
-        calcImportancePartial(mode);
-        for (int j=0; j<memory_neurons; ++j)
+        for (int i=0; i<topology[topology.size()-1]; ++i)
         {
-            importance[topology.size()-1][topology[topology.size()-1]-1-j]=importance[0][topology[0]-1-j];
+            importance[topology.size()-1][i]=1;
+            effect[topology.size()-1][i]=1;
+        }
+        for (int i=0; i<IMPORTANCE_ITERATIONS; ++i)
+        {
+            calcImportancePartial(mode);
+            for (int j=0; j<memory_neurons; ++j)
+            {
+                importance[topology.size()-1][topology[topology.size()-1]-1-j]=importance[0][topology[0]-1-j];
+            }
+        }
+    }
+    else
+    {
+        for (int i=0; i<topology[topology.size()-1]; ++i)
+        {
+            importance[topology.size()-1][i]=0;
+            effect[topology.size()-1][i]=0;
+        }
+        if (neuron<topology[topology.size()-1])
+        {
+            importance[topology.size()-1][neuron]=1;
+            effect[topology.size()-1][neuron]=1;
+            calcImportancePartial(mode);
+        }
+        else
+        {
+            for (int i=0; i<topology[topology.size()-1]; ++i)
+            {
+                for (int j=0; j<topology[i]; ++j)
+                {
+                    importance[i][j]=0;
+                    effect[i][j]=0;
+                }
+            }
         }
     }
 }
 void ctrNeuralNetwork::calcImportancePartial(int mode)
 {
     double max_imp;
+    double max_eff;
     for (int i=topology.size()-2; i>=0; --i)
     {
         max_imp=0;
+        max_eff=0;
         for (int j=0; j<topology[i]; ++j)
         {
             importance[i][j]=0;
+            effect[i][j]=0;
             for (int k=0; k<topology[i+1]; ++k)
             {
                 if (mode==0) importance[i][j]+=fabs(weights[i+1][k][j]*importance[i+1][k]);
                 else importance[i][j]+=pow(weights[i+1][k][j]*importance[i+1][k],2);
+                effect[i][j]+=weights[i+1][k][j]*effect[i+1][k];
             }
             if (importance[i][j]>max_imp) max_imp=importance[i][j];
+            if (fabs(effect[i][j])>max_eff) max_eff=fabs(effect[i][j]);
         }
         for (int j=0; j<topology[i]; ++j)
         {
             importance[i][j]/=max_imp;
+            effect[i][j]/=max_eff;
         }
     }
 }

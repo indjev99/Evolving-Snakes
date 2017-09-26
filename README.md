@@ -11,13 +11,15 @@ Controls:
 * f1 - cycle trough the snakes  (the selected snake will blink; its neural network is shown in the other window)
 * f2 - pause
 * f3 - toggle off/on drawing the window with the snakes
-* f4 - toggle off/on drawing the window with the neural networks
-* f5 - cycle trough drawing modes for the NNs (regular; connections showing thier current effect; relative importance as a linear sum; relative importance as a sum of squares)
-* f6 - enter new delay between steps in seconds in the console (0 for no delay - max speed)
-* f7 - save the current state, enter the name of the file in the console
-* f8 - load a save, eneter the name of the file in the console
-* f9 - change settings/reset, enter 'y' or 'n' in the console to choose whether to reset and then whether to chenge the settings, the current settings will be shown in brackets
-* f10 - toggle on/off controlling the selected snake with the arrow keys.
+* f4 - cycle trough drawing modes for the snake window (regular; only living snakes; only not yet hatched snakes; only dead, not decomposed snakes)
+* f5 - toggle off/on drawing the window with the neural networks
+* f6 - cycle trough drawing modes for the NNs (regular; connections showing thier current effect; relative importance as a linear sum; relative importance as a sum of squares)
+* f7 - cycle trough the output neurons, the effect each neuron has on that output neuron is shown, the importances are shown only for that output neuron
+* f8 - enter new delay between steps in seconds in the console (0 for no delay - max speed)
+* f9 - save the current state, enter the name of the file in the console
+* f10 - load a save, eneter the name of the file in the console
+* f11 - change settings/reset, enter 'y' or 'n' in the console to choose whether to reset and then whether to chenge the settings, the current settings will be shown in brackets
+* f12 - toggle on/off controlling the selected snake with the arrow keys.
 
 There are more options for the loading:
 

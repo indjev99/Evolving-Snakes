@@ -11,7 +11,6 @@ void drawPartEllipse(float x, float y, float radiusX, float radiusY, double alph
 {
     alpha=round(alpha*2);
     beta=round(beta*2);
-    glBegin(GL_TRIANGLES);
     for(int i=alpha;i<beta;++i)
     {
         float rad=i*0.5*DEG2RAD;
@@ -22,7 +21,6 @@ void drawPartEllipse(float x, float y, float radiusX, float radiusY, double alph
         glVertex2f(cos(rad2)*radiusX+x,sin(rad2)*radiusY+y);
         glVertex2f(x,y);
     }
-    glEnd();
 }
 void drawGridSquare(int x, int y, double colour_r, double colour_g, double colour_b, double thickness)
 {
@@ -146,7 +144,7 @@ void drawFood(food& f)
 
     glEnd();
 }
-void drawWindow(GLFWwindow* w, std::vector<snake>& snakes, std::vector<food>& foods, int selected)
+void drawWindow(GLFWwindow* w, std::vector<snake>& snakes, std::vector<food>& foods, int mode, int selected)
 {
     glfwSetWindowShouldClose(w,0);
     pressed=-1;
@@ -179,11 +177,11 @@ void drawWindow(GLFWwindow* w, std::vector<snake>& snakes, std::vector<food>& fo
     //drawGrid(0.1,0.1,0.1,0.1);
     for (int i=0;i<snakes.size();++i)
     {
-        drawSnake(snakes[i],selected==i);
+        if (mode==0 || (mode==1 && snakes[i].dead==0) || (mode==2 && snakes[i].dead>0) || (mode==3 && snakes[i].dead<0)) drawSnake(snakes[i],selected==i);
     }
     for (int i=0;i<foods.size();++i)
     {
-        drawFood(foods[i]);
+        if (mode==0) drawFood(foods[i]);
     }
 
     glfwSwapBuffers(w);
