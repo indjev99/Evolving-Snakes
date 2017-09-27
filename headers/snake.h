@@ -24,7 +24,7 @@ struct snake
     double defence,attack;
     double colour_r, colour_g, colour_b;
     int dead;
-    int energy;
+    int used_energy;
     int direction;
     bool speed_boost;
     bool defence_boost;
@@ -35,8 +35,8 @@ struct snake
     void randomise(int food, controller* new_ctr);
     bool moveForward();
     std::pair<int, std::vector<block> > think();
-    void eat(int food=1);
-    std::pair<int, std::vector<block> > getBit(int node, double enemy_attack);
+    void eat(int food=1, int new_used_energy=0);
+    std::pair<std::pair<int, int>, std::vector<block> > getBit(int node, double enemy_attack);
     void die(bool part);
     void birth();
     void mutate();

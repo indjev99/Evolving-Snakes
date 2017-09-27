@@ -31,7 +31,7 @@ void snake::randomise(int food, controller* new_ctr)
     randomiseVariable(colour_b,0,1);
     ctr=new_ctr;
     ctr->randomise();
-    energy=MAX_ENERGY;
+    used_energy=0;
     speed_boost=0;
     defence_boost=0;
 }
@@ -60,11 +60,11 @@ bool snake::moveForward()
     }
     blocks[0].food=0;
     blocks[0]+=direction;
-    --energy;
-    while (energy<=0)
+    ++used_energy;
+    while (used_energy>=MAX_ENERGY)
     {
         --blocks[0].food;
-        energy+=MAX_ENERGY;
+        used_energy-=MAX_ENERGY;
     }
     if (new_pos.food>0)
     {
@@ -118,7 +118,7 @@ std::pair<int, std::vector<block> > snake::think()
     }
     if (decision.boost_defence)
     {
-        --energy;
+        ++used_energy;
         defence_boost=1;
         defence+=DEFENCE_BOOST;
     }
@@ -126,7 +126,7 @@ std::pair<int, std::vector<block> > snake::think()
     int x1,y1,x2,y2;
     if (decision.split)
     {
-        --energy;
+        ++used_energy;
     }
     if (decision.split && blocks.size()>=MIN_SPLIT_LENGTH && decision.split_length>=MIN_LENGTH && blocks.size()-decision.split_length>=MIN_LENGTH)
     {
@@ -164,12 +164,13 @@ std::pair<int, std::vector<block> > snake::think()
     }
     return make_pair(dir,new_snake);
 }
-void snake::eat(int food)
+void snake::eat(int food, int new_used_energy)
 {
     if (blocks.empty()) return;
+    used_energy+=new_used_energy;
     blocks[0].food+=food;
 }
-std::pair<int, std::vector<block> > snake::getBit(int node, double enemy_attack)
+std::pair<std::pair<int, int>, std::vector<block> > snake::getBit(int node, double enemy_attack)
 {
     int food_given=0;
     std::vector<block> left;
@@ -180,7 +181,7 @@ std::pair<int, std::vector<block> > snake::getBit(int node, double enemy_attack)
         left.push_back(blocks[i]);
     }
     blocks.resize(node);
-    return {food_given,left};
+    return {{food_given,node==0?used_energy:0},left};
 }
 void snake::die(bool part)
 {
@@ -192,11 +193,12 @@ void snake::die(bool part)
     }
     dead=-DECOMPOSITION_TIME-1;
     if (!part) delete ctr;
+    else used_energy=0;
 }
 void snake::birth()
 {
     dead=BIRTH_TIME;
-    energy=MAX_ENERGY;
+    used_energy=0;
     speed_boost=0;
     defence_boost=0;
 

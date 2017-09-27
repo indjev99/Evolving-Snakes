@@ -27,10 +27,19 @@ double SNAKE_PROBABILITY=0.000002;
 
 const int SEED=1;
 
-const vector<string> files={"save2","save2_new","save2_defence","save2_mult5","save2_nofood_300","save2_nofood_500","save2_nofood_300_defence","save2_nofood_500_defence","save2_eggs"
+const vector<string> files={"save2","save2_new","save2_defence","save2_mult5","save2_nofood_300","save2_nofood_500","save2_nofood_300_defence","save2_nofood_500_defence","save2_eggs",
                             "save2_food","save2_food_notimes","save2_food_defence","save2_food_notimes_defence",
                             "save10","save10_new","save10_defence","save10_nofood_300","save10_nofood_500","save10_nofood_500_changed","save10_nofood_300_defence","save10_nofood_500_defence","save10_eggs",
                             "save10_food","save10_food_notimes","save10_food_defence","save10_food_notimes_defence"};
+
+/*
+const vector<string> files={"save2_nofood_300","save2_nofood_500",
+                            "save10_nofood_300","save10_nofood_500"};*/
+
+/*
+const vector<string> files={"save2_nofood_300_coed","save2_nofood_500_coed","save2_nofood_500_old_coed",
+                            "save10_nofood_300_coed","save10_nofood_500_coed","save10_nofood_500_changed_coed",
+                            "save10_nofood_500_old_coed","save10_nofood_500_changed_old_coed"}; //conservation of energy defyieng */
 
 //const vector<string> files={"save2_nofood_300","save2_nofood_500","save2_nofood_300_defence","save2_nofood_500_defence","save10_nofood_300_defence","save10_nofood_500_defence","save2_mult5","save10_mult5"};
 //const vector<string> files={"save2_food","save2_food_notimes","save2_food_defence","save2_food_notimes_defence","save10_food","save10_food_notimes","save10_food_defence","save10_food_notimes_defence"};
@@ -74,7 +83,8 @@ controller* selectRandomController()
 vector<snake> snakes[2];
 vector<food> foods[2];
 vector<pair<int, int> > curr;
-pair<int, vector<block> > res;
+pair<int, vector<block> > res_think;
+pair<pair<int, int>, vector<block> > res_get_bit;
 vector<int> removed_snakes;
 vector<int> removed_foods;
 bool cv; //current vector
@@ -144,13 +154,13 @@ void saveData(string filename)
     file<<foods[cv].size()<<' ';
     for (int i=0;i<foods[cv].size();++i)
     {
-        file<<foods[cv][i].colour_r<<' '<<foods[cv][i].colour_g<<' '<<foods[cv][i].colour_b<<' '<<foods[cv][i].x<<' '<<foods[cv][i].y<<' ';
+        file<<foods[cv][i].colour_r<<' '<<foods[cv][i].colour_g<<' '<<foods[cv][i].colour_b<<' '<<foods[cv][i].used_energy<<' '<<foods[cv][i].ex_snake<<' '<<foods[cv][i].x<<' '<<foods[cv][i].y<<' ';
     }
     file<<snakes[cv].size()<<' ';
     for (int i=0;i<snakes[cv].size();++i)
     {
         file<<snakes[cv][i].name<<' '<<snakes[cv][i].time_alive<<' '<<snakes[cv][i].attack<<' '<<snakes[cv][i].defence_boost<<' '
-        <<snakes[cv][i].colour_r<<' '<<snakes[cv][i].colour_g<<' '<<snakes[cv][i].colour_b<<' '<<snakes[cv][i].direction<<' '<<snakes[cv][i].dead<<' '<<snakes[cv][i].energy<<' ';
+        <<snakes[cv][i].colour_r<<' '<<snakes[cv][i].colour_g<<' '<<snakes[cv][i].colour_b<<' '<<snakes[cv][i].direction<<' '<<snakes[cv][i].dead<<' '<<snakes[cv][i].used_energy<<' ';
         file<<snakes[cv][i].blocks.size()<<' ';
         for (int j=0;j<snakes[cv][i].blocks.size();++j)
         {
@@ -275,7 +285,10 @@ void loadData(string filename, bool first, bool lowest_level)
     }
     for (int i=start;i<foods[cv].size();++i)
     {
-        file>>foods[cv][i].colour_r>>foods[cv][i].colour_g>>foods[cv][i].colour_b>>foods[cv][i].x>>foods[cv][i].y;
+        file>>foods[cv][i].colour_r>>foods[cv][i].colour_g>>foods[cv][i].colour_b>>foods[cv][i].used_energy>>foods[cv][i].ex_snake>>foods[cv][i].x>>foods[cv][i].y;
+        /*foods[cv][i].used_energy=0;
+        if (foods[cv][i].colour_r==0.15 && foods[cv][i].colour_g==1 && foods[cv][i].colour_b==0.05) foods[cv][i].ex_snake=0;
+        else foods[cv][i].ex_snake=1;*/
     }
     file>>s;
     start=0;
@@ -287,7 +300,8 @@ void loadData(string filename, bool first, bool lowest_level)
     }
     for (int i=start;i<snakes[cv].size();++i)
     {
-        file>>snakes[cv][i].name>>snakes[cv][i].time_alive>>snakes[cv][i].attack>>snakes[cv][i].defence_boost>>snakes[cv][i].colour_r>>snakes[cv][i].colour_g>>snakes[cv][i].colour_b>>snakes[cv][i].direction>>snakes[cv][i].dead>>snakes[cv][i].energy;
+        file>>snakes[cv][i].name>>snakes[cv][i].time_alive>>snakes[cv][i].attack>>snakes[cv][i].defence_boost>>snakes[cv][i].colour_r
+        >>snakes[cv][i].colour_g>>snakes[cv][i].colour_b>>snakes[cv][i].direction>>snakes[cv][i].dead>>snakes[cv][i].used_energy;
         file>>s;
         snakes[cv][i].blocks.resize(s);
         for (int j=0;j<snakes[cv][i].blocks.size();++j)
@@ -312,6 +326,8 @@ void loadData(string filename, bool first, bool lowest_level)
     }
     for (int i=0;i<snakes[cv].size();++i)
     {
+        //snakes[cv][i].used_energy=snake::MAX_ENERGY-snakes[cv][i].used_energy;
+
         snakes[cv][i].defence=(1-snakes[cv][i].attack)*snake::DEFENCE_MULTIPLIER+snake::DEFENCE_ADDER;
         if (snakes[cv][i].defence_boost) snakes[cv][i].defence+=snake::DEFENCE_BOOST;
         snakes[cv][i].speed_boost=0;
@@ -360,7 +376,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
         //cerr<<"Start"<<"\n";
 
         curr_time=high_resolution_clock::now();
-        if (bot_enabled && duration_cast<duration<double>>(curr_time-bot_start_time).count()>=300)
+        if (bot_enabled && duration_cast<duration<double>>(curr_time-bot_start_time).count()>=120)
         {
             if (current_file>=0 && current_file<files.size())
             {
@@ -373,10 +389,10 @@ void run(GLFWwindow* sim, GLFWwindow* net)
             if (current_file<files.size())
             {
                 cout<<"Starting with file "<<files[current_file]<<endl;
-                bot_start_time=high_resolution_clock::now();
                 loadData(files[current_file]);
                 //foods[cv].resize(0);
                 //snakes[cv].resize(0);
+                bot_start_time=high_resolution_clock::now();
             }
             else
             {
@@ -563,18 +579,18 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                 //cerr<<"Isn't player"<<"\n";
 
                 seeAll(field,snakes[cv][i]);
-                res=snakes[cv][i].think();
-                if (!res.second.empty())
+                res_think=snakes[cv][i].think();
+                if (!res_think.second.empty()) //snake separated a part of itself
                 {
                     s=snakes[cv][i];
                     s.birth();
-                    s.blocks=res.second;
-                    s.direction=res.first;
+                    s.blocks=res_think.second;
+                    s.direction=res_think.first;
                     snakes[cv].push_back(s);
-                    for (int j=0;j<res.second.size();++j)
+                    for (int j=0;j<res_think.second.size();++j)
                     {
-                        x=res.second[j].x;
-                        y=res.second[j].y;
+                        x=res_think.second[j].x;
+                        y=res_think.second[j].y;
                         for (int k=0;k<field[x+FIELD_RADIUS][y+FIELD_RADIUS].size();++k)
                         {
                             if (field[x+FIELD_RADIUS][y+FIELD_RADIUS][k].first==i && field[x+FIELD_RADIUS][y+FIELD_RADIUS][k].second!=-1)
@@ -660,7 +676,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                 {
                     int f=field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].first;
                     removed_foods.push_back(f);
-                    snakes[cv][i].eat();
+                    snakes[cv][i].eat(1,foods[cv][f].used_energy);
                     field[x+FIELD_RADIUS][y+FIELD_RADIUS].erase(field[x+FIELD_RADIUS][y+FIELD_RADIUS].begin()+j);
                     --j;
                 }
@@ -669,12 +685,11 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                     int curr_snake=field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].first;
                     int curr_node=field[x+FIELD_RADIUS][y+FIELD_RADIUS][j].second;
                     if (curr_snake==i && curr_node==0) continue;
-                    res=snakes[cv][curr_snake].getBit(curr_node,snakes[cv][i].attack);
-                    food_gained=res.first;
-                    if (!res.second.empty()) //there is some leftover body
+                    res_get_bit=snakes[cv][curr_snake].getBit(curr_node,snakes[cv][i].attack);
+                    if (!res_get_bit.second.empty()) //there is some leftover body
                     {
                         s=snakes[cv][curr_snake];
-                        s.blocks=res.second;
+                        s.blocks=res_get_bit.second;
                         if (s.dead>=0) s.die(1);
                         snakes[cv].push_back(s);
                         for (int k=0;k<s.blocks.size();++k)
@@ -691,7 +706,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                             }
                         }
                     }
-                    snakes[cv][i].eat(food_gained);
+                    snakes[cv][i].eat(res_get_bit.first.first,res_get_bit.first.second);
                     field[x+FIELD_RADIUS][y+FIELD_RADIUS].erase(field[x+FIELD_RADIUS][y+FIELD_RADIUS].begin()+j); //removes the eaten snake part from field
                     --j;
                 }
@@ -717,7 +732,7 @@ void run(GLFWwindow* sim, GLFWwindow* net)
                 {
                     for (int j=0;j<snakes[cv][i].blocks.size();++j)
                     {
-                        curr_food=food(snakes[cv][i].blocks[j].x,snakes[cv][i].blocks[j].y,snakes[cv][i].colour_r,snakes[cv][i].colour_g,snakes[cv][i].colour_b);
+                        curr_food=food(snakes[cv][i].blocks[j].x,snakes[cv][i].blocks[j].y,snakes[cv][i].colour_r,snakes[cv][i].colour_g,snakes[cv][i].colour_b,j==0?snakes[cv][i].used_energy:0);
                         foods[cv].push_back(curr_food);
                     }
                     if (snakes[cv][i].dead>=0) cerr<<"place 3: "<<snakes[cv][i].dead<<endl;

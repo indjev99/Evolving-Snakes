@@ -11,10 +11,11 @@ struct food:point
     double colour_r;
     double colour_g;
     double colour_b;
+    int used_energy;
+    bool ex_snake;
     food();
     food(int new_x, int new_y);
-    food(double red, double green, double blue);
-    food(int new_x, int new_y, double red, double green, double blue);
+    food(int new_x, int new_y, double red, double green, double blue, int new_used_energy);
 
     ~food() =default;
 };
