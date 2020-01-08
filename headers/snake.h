@@ -41,7 +41,7 @@ struct snake
     void birth();
     void mutate();
 
-    ~snake() =default;
+    ~snake();
 };
 
 #endif // SNAKE_H_INCLUDED

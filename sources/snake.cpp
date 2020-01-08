@@ -216,3 +216,8 @@ void snake::mutate()
     mutateVariable(colour_b,0,1);
     ctr->mutate();
 }
+
+snake::~snake()
+{
+    delete ctr;
+}
