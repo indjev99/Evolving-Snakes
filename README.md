@@ -5,6 +5,8 @@ Snakes from the classical game are controlled by neural networks and are evolved
 
 Video demo: https://www.youtube.com/watch?v=eQoa-uFyXFw
 
+Download executable: https://sourceforge.net/projects/evolving-snakes/
+
 This project uses the GLFW library and OpenGL.
 
 Controls:
